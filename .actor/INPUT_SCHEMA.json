@@ -1,0 +1,39 @@
+{
+    "title": "CheerioCrawler Template",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "startUrls": {
+            "title": "Expedia or Hotels.com URLs",
+            "type": "array",
+            "description": "URLs of hotels to scrape reviews from. If you add any userData, it will be included in each review for given hotel under the key `customData`",
+            "editor": "requestListSources",
+            "prefill": [
+                {
+                    "url": "https://www.expedia.com/Prague-Hotels-Hotel-Krystal.h10966026.Hotel-Information"
+                }
+            ]
+        },
+        "maxReviewsPerHotel": {
+            "title": "Maximum reviews per hotel",
+            "type": "integer",
+            "minimum": 1,
+            "description": "Maximum number of reviews to scrape per hotel",
+            "default": 9999999,
+            "prefill": 9999999
+        },
+        "proxyConfiguration": {
+            "title": "Proxy configuration",
+            "type": "object",
+            "description": "Optionally use Apify Proxy",
+            "prefill": {
+                "useApifyProxy": true
+            },
+            "default": {
+                "useApifyProxy": true
+            },
+            "editor": "proxy"
+        }
+    },
+    "required": ["startUrls"]
+}
