@@ -1,24 +1,102 @@
-# CheerioCrawler project
+# Expedia / Hotels.com reviews scraper
 
-This template is a production ready boilerplate for developing with `CheerioCrawler`.
-Use this to bootstrap your projects using the most up-to-date code.
+This is a simple scraper to get reviews data from hotels, apartments and other accomodations listed on Expedia.com and Hotels.com portals.
 
-> We decided to split Apify SDK into two libraries, [Crawlee](https://crawlee.dev) and [Apify SDK v3](https://sdk.apify.com). Crawlee will retain all the crawling and scraping-related tools and will always strive to be the best web scraping library for its community. At the same time, Apify SDK will continue to exist, but keep only the Apify-specific features related to building actors on the Apify platform. Read the [upgrading guide](https://sdk.apify.com/docs/upgrading/upgrading-to-v3) to learn about the changes.
+For each hotel, input a link to the hotel detail page, which will look something like this:
 
-If you're looking for examples or want to learn more visit:
+```raw
+https://www.expedia.com/Prague-Hotels-Pentahotel-Prague.h525006.Hotel-Information?chkin=2023-03-17&chkout=2023-03-18&x_pwa=1&rfrr=HSR&pwa_ts=1677850168323&sort=RECOMMENDED&top_dp=82&top_cur=USD&userIntent=
+https://www.hotels.com/ho136900/hilton-prague-old-town-prague-czech-republic/?pwaDialogNested=PropertyDetailsReviewsBreakdownDialog
+```
 
--   [Crawlee + Apify Platform guide](https://crawlee.dev/docs/guides/apify-platform)
--   [Cheerio Tutorial](https://crawlee.dev/docs/guides/cheerio-crawler-guide)
--   [Documentation](https://crawlee.dev/api/cheerio-crawler/class/CheerioCrawler)
--   [Examples](https://crawlee.dev/docs/examples/cheerio-crawler)
+Additionally, you can click on the "Advanced" button in the URL input field and provide any `userData`. Everything provided here will be available on each review as `customData`, to allow later easy identification of which review belongs to which hotel.
 
-## Documentation reference
+You will get raw review data, so individual reviews will look something like this:
 
--   [Crawlee](https://crawlee.dev)
--   [Apify SDK v3](https://sdk.apify.com)
--   [Apify Actor documentation](https://docs.apify.com/actor)
--   [Apify CLI](https://docs.apify.com/cli)
+```json
+{
+    "contentDirectFeedbackPromptId": null,
+    "id": "123456789abcdef",
+    "superlative": "Excellent",
+    "locale": "en_GB",
+    "title": "",
+    "brandType": "Expedia",
+    "reviewScoreWithDescription": {
+        "label": "10 out of 10 Excellent",
+        "value": "10/10 Excellent"
+    },
+    "text": "Excellent location and value for money. Great service. Clean. ",
+    "seeMoreAnalytics": {
+        "linkName": "See more reviews",
+        "referrerId": "HOT.HIS.See_more."
+    },
+    "submissionTime": {
+        "longDateFormat": "Apr 15, 2022"
+    },
+    "impressionAnalytics": null,
+    "themes": [
+        {
+            "icon": {
+                "id": "sentiment_4"
+            },
+            "label": "Liked: Cleanliness, staff & service, amenities, property conditions & facilities"
+        }
+    ],
+    "reviewFooter": {
+        "messages": [
+            {
+                "seoStructuredData": {
+                    "itemscope": true,
+                    "itemprop": "author",
+                    "itemtype": "https://schema.org/Person",
+                    "content": "John"
+                },
+                "text": {
+                    "text": "Stayed 1 night in Apr 2022"
+                }
+            }
+        ]
+    },
+    "reviewInteractionSections": [
+        {
+            "primaryDisplayString": "0",
+            "accessibilityLabel": "Mark review 3 as helpful. 0 other users found review 3 helpful.",
+            "reviewInteractionType": "HELPFUL_REVIEW",
+            "feedbackAnalytics": {
+                "linkName": "Helpful review",
+                "referrerId": "HOT.HIS.ReviewsOverlay.THUMB_UP.UPVOTE"
+            }
+        },
+        {
+            "primaryDisplayString": null,
+            "accessibilityLabel": null,
+            "reviewInteractionType": "REVIEW_REPORT_FLAG",
+            "feedbackAnalytics": null
+        }
+    ],
 
-## Writing a README
-
-See our tutorial on [writing READMEs for your actors](https://help.apify.com/en/articles/2912548-how-to-write-great-readme-for-your-actors) if you need more inspiration.
+    "reviewAuthorAttribution": {
+        "text": "John"
+    },
+    "photoSection": null,
+    "photos": [],
+    "travelers": ["Traveled with family"],
+    "translationInfo": null,
+    "propertyReviewSource": null,
+    "reviewRegion": null,
+    "managementResponses": [
+        {
+            "id": "3b23cd4c-ac5c-42a7-91f2-89b8d8dec7e2",
+            "header": {
+                "text": "Response from Jane on Apr 19, 2022"
+            },
+            "response": "Thank you so much, we appreciate it a lot!"
+        }
+    ],
+    "hotelId": "123456",
+    "customData": {
+        "userDataKey1": "your custom data here",
+        "userDataKey2": "any amount of data here"
+    }
+}
+```

@@ -1,26 +1,42 @@
 import { randomUUID } from "crypto";
 import { readFile } from "fs/promises";
 
+export const SITES_CONFIG: Record<
+    string,
+    { urlRegex: RegExp | null; siteId: number }
+> = {
+    "www.expedia.com": {
+        urlRegex: /\.h(\d+)\.Hotel-Information/,
+        siteId: 1,
+    },
+    "www.hotels.com": {
+        urlRegex: null,
+        siteId: 300000001,
+    },
+};
+
+export enum LABEL {
+    GET_HOTEL_ID = "GET_HOTEL_ID",
+    REVIEWS_PAGE = "REVIEWS_PAGE",
+}
+
 export const PAGE_SIZE = 10;
 const QUERY = await readFile("src/reviewsQuery.graphql", "utf-8");
 
 const getReviewsPageRequest = (
     hotelId: string,
     startIndex: number,
-    customData: any
+    customData: any,
+    site: string
 ): {
     url: string;
     method: "POST";
     uniqueKey: string;
     payload: string;
     headers: Record<string, string>;
-    userData: {
-        hotelId: string;
-        startIndex: number;
-        customData: any;
-    };
+    userData: any;
 } => ({
-    url: "https://www.expedia.com/graphql",
+    url: `https://${site}/graphql`,
     method: "POST",
     uniqueKey: `reviews-${hotelId}?start=${startIndex}`,
     headers: {
@@ -31,13 +47,15 @@ const getReviewsPageRequest = (
         hotelId,
         startIndex,
         customData,
+        label: LABEL.REVIEWS_PAGE,
+        site,
     },
     payload: JSON.stringify([
         {
             operationName: "PropertyFilteredReviewsQuery",
             variables: {
                 context: {
-                    siteId: 1,
+                    siteId: SITES_CONFIG[site].siteId,
                     locale: "en_US",
                     eapid: 0,
                     currency: "USD",
@@ -92,12 +110,13 @@ export const getNextPagesRequests = (
     hotelId: string,
     currentIndex: number | null,
     maxReviewsPerHotel: number,
-    customData: any
+    customData: any,
+    site: string
 ) =>
     new Array(3)
         .fill(undefined)
         .map((_, i) => (currentIndex ?? -PAGE_SIZE) + PAGE_SIZE * (i + 1))
         .filter((startIndex) => startIndex < maxReviewsPerHotel)
         .map((startIndex) =>
-            getReviewsPageRequest(hotelId, startIndex, customData)
+            getReviewsPageRequest(hotelId, startIndex, customData, site)
         );
