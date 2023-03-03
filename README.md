@@ -1,6 +1,6 @@
 # Expedia / Hotels.com reviews scraper
 
-This is a simple scraper to get reviews data from hotels, apartments and other accomodations listed on Expedia.com and Hotels.com portals.
+This is a simple scraper to get reviews from URLs hotels, apartments and other accommodations listed on Expedia.com and Hotels.com portals.
 
 For each hotel, input a link to the hotel detail page, which will look something like this:
 
