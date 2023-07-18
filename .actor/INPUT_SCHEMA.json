@@ -19,20 +19,29 @@
             "type": "integer",
             "minimum": 1,
             "description": "Maximum number of reviews to scrape per hotel",
-            "default": 9999999,
-            "prefill": 9999999
+            "default": 99999999
         },
         "proxyConfiguration": {
             "title": "Proxy configuration",
             "type": "object",
             "description": "Optionally use Apify Proxy",
-            "prefill": {
-                "useApifyProxy": true
-            },
             "default": {
                 "useApifyProxy": true
             },
             "editor": "proxy"
+        },
+        "debugLog": {
+            "title": "Enable debug logging",
+            "type": "boolean",
+            "editor": "checkbox",
+            "description": "Enables more verbose logging"
+        },
+        "maxRequestRetries": {
+            "title": "Maximum request retries",
+            "type": "integer",
+            "minimum": 2,
+            "description": "Maximum number of retries when a request fails",
+            "default": 8
         }
     },
     "required": ["startUrls"]

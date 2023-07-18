@@ -9,7 +9,11 @@ const input = (await Actor.getInput<{
     proxyConfiguration: ProxyConfigurationOptions;
     startUrls: Source[];
     maxReviewsPerHotel: number;
+    maxRequestRetries: number;
+    debugLog: boolean;
 }>())!;
+
+if (input.debugLog) log.setLevel(log.LEVELS.DEBUG);
 
 const unprocessedRequestList = await RequestList.open(
     "start-urls",
@@ -64,6 +68,7 @@ const crawler = new CheerioCrawler({
     proxyConfiguration: await Actor.createProxyConfiguration(
         input.proxyConfiguration
     ),
+    maxRequestRetries: input.maxRequestRetries,
     requestHandler: router as any,
 });
 
