@@ -68,6 +68,8 @@ const crawler = new CheerioCrawler({
     proxyConfiguration: await Actor.createProxyConfiguration(
         input.proxyConfiguration
     ),
+    // temporary workaround for https://github.com/apify/crawlee/issues/1994
+    additionalMimeTypes: ["application/octet-stream"],
     maxRequestRetries: input.maxRequestRetries,
     requestHandler: router as any,
 });
