@@ -26,7 +26,8 @@
             "type": "object",
             "description": "Optionally use Apify Proxy",
             "default": {
-                "useApifyProxy": true
+                "useApifyProxy": true,
+                "apifyProxyGroups": ["RESIDENTIAL"]
             },
             "editor": "proxy"
         },
