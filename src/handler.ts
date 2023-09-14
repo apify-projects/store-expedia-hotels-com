@@ -22,7 +22,9 @@ router.addHandler(
             .toArray()
             .flatMap((script) => {
                 const text = $(script).text();
-                const match = text.match(/\\"hotelId\\"\s*:\s*(\d+)/);
+                const match = text.match(
+                    /"propertyId\\\\\\"\s*:\s*\\\\\\"(\d+)\\\\\\"/
+                );
                 if (match) return [match[1]];
                 return [];
             });

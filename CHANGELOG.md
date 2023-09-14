@@ -1,3 +1,9 @@
+### 2023-09-14 (0.0.11)
+
+_Fixes_
+
+-   Fixed hotelId detection for hotels.com (Actor was previously failing with `Error: Could not extract hotel ID from https://www.hotels.com/...`
+
 ### 2023-09-14 (0.0.9)
 
 _Added_
