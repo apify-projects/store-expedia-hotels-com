@@ -54,10 +54,11 @@ router.addHandler(
 router.addHandler<UserData>(
     LABEL.REVIEWS_PAGE,
     async ({ request, json, crawler, scrapeSettings }) => {
-        const reviews = json[0].data.propertyInfo.reviewInfo.reviews.slice(
-            0,
-            scrapeSettings.maxReviewsPerHotel - request.userData.startIndex
-        );
+        const reviews: any[] =
+            json[0].data.propertyInfo.reviewInfo.reviews.slice(
+                0,
+                scrapeSettings.maxReviewsPerHotel - request.userData.startIndex
+            );
         if (reviews.length === 0) return;
         await crawler.addRequests(
             getNextPagesRequests(
@@ -69,9 +70,10 @@ router.addHandler<UserData>(
             )
         );
         await Dataset.pushData(
-            reviews.map((review: any) => ({
+            reviews.map((review, i) => ({
                 ...review,
                 hotelId: request.userData.hotelId,
+                reviewPosition: request.userData.startIndex + i + 1,
                 customData: request.userData.customData,
             }))
         );

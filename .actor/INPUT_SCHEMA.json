@@ -45,9 +45,9 @@
             "default": 8
         },
         "sortBy": {
-            "title": "Sort by",
+            "title": "Sort by (see note)",
             "type": "string",
-            "description": "Sort reviews by given criteria",
+            "description": "Note: this will not affect the order of reviews in the dataset, since review items are scraped in parallel, so later pages might finish before previous ones. However, it helps in the case you are limiting maximum number of reviews per hotel.",
             "editor": "select",
             "default": "Most relevant",
             "enum": [
