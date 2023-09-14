@@ -43,6 +43,19 @@
             "minimum": 2,
             "description": "Maximum number of retries when a request fails",
             "default": 8
+        },
+        "sortBy": {
+            "title": "Sort by (see note)",
+            "type": "string",
+            "description": "Note: this will not affect the order of reviews in the dataset, since review items are scraped in parallel, so later pages might finish before previous ones. However, it helps in the case you are limiting maximum number of reviews per hotel.",
+            "editor": "select",
+            "default": "Most relevant",
+            "enum": [
+                "Most relevant",
+                "Most recent",
+                "Highest guest rating",
+                "Lowest guest rating"
+            ]
         }
     },
     "required": ["startUrls"]

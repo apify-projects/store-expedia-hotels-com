@@ -1,7 +1,13 @@
 import { Actor, log, ProxyConfigurationOptions } from "apify";
 import { CheerioCrawler, RequestList, Source } from "@crawlee/cheerio";
 import { router } from "./handler.js";
-import { getNextPagesRequests, LABEL, SITES_CONFIG } from "./utils.js";
+import {
+    getNextPagesRequests,
+    LABEL,
+    ScrapeSettings,
+    SITES_CONFIG,
+    SortBy,
+} from "./utils.js";
 
 await Actor.init();
 
@@ -11,9 +17,15 @@ const input = (await Actor.getInput<{
     maxReviewsPerHotel: number;
     maxRequestRetries: number;
     debugLog: boolean;
+    sortBy: SortBy;
 }>())!;
 
 if (input.debugLog) log.setLevel(log.LEVELS.DEBUG);
+
+const scrapeSettings: ScrapeSettings = {
+    sortBy: input.sortBy,
+    maxReviewsPerHotel: input.maxReviewsPerHotel,
+};
 
 const unprocessedRequestList = await RequestList.open(
     "start-urls",
@@ -49,7 +61,7 @@ while (true) {
             ...getNextPagesRequests(
                 match[1],
                 null,
-                input.maxReviewsPerHotel,
+                scrapeSettings,
                 request.userData,
                 site
             )
@@ -57,13 +69,10 @@ while (true) {
     }
 }
 
-export type ExtraContext = {
-    maxReviewsPerHotel: number;
-};
-
 router.use((ctx) => {
-    ctx.maxReviewsPerHotel = input.maxReviewsPerHotel;
+    ctx.scrapeSettings = scrapeSettings;
 });
+
 const crawler = new CheerioCrawler({
     proxyConfiguration: await Actor.createProxyConfiguration(
         input.proxyConfiguration

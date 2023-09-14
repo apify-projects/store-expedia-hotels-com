@@ -20,11 +20,39 @@ export enum LABEL {
     REVIEWS_PAGE = "REVIEWS_PAGE",
 }
 
+export enum SortBy {
+    MostRelevant = "Most relevant",
+    MostRecent = "Most recent",
+    HighestGuestRating = "Highest guest rating",
+    LowestGuestRating = "Lowest guest rating",
+}
+
+const sortByToRequestParamMap: Record<SortBy, string> = {
+    [SortBy.MostRelevant]: "NEWEST_TO_OLDEST_BY_LANGUAGE",
+    [SortBy.MostRecent]: "NEWEST_TO_OLDEST",
+    [SortBy.HighestGuestRating]: "HIGHEST_TO_LOWEST_RATED",
+    [SortBy.LowestGuestRating]: "LOWEST_TO_HIGHEST_RATED",
+};
+
 export const PAGE_SIZE = 10;
 const QUERY = await readFile("src/reviewsQuery.graphql", "utf-8");
 
+export type ScrapeSettings = {
+    sortBy: SortBy;
+    maxReviewsPerHotel: number;
+};
+
+export type UserData = {
+    hotelId: string;
+    startIndex: number;
+    customData: any;
+    site: string;
+    label: LABEL;
+};
+
 const getReviewsPageRequest = (
     hotelId: string,
+    scrapeSettings: ScrapeSettings,
     startIndex: number,
     customData: any,
     site: string
@@ -34,7 +62,7 @@ const getReviewsPageRequest = (
     uniqueKey: string;
     payload: string;
     headers: Record<string, string>;
-    userData: any;
+    userData: UserData;
 } => ({
     url: `https://${site}/graphql`,
     method: "POST",
@@ -82,7 +110,10 @@ const getReviewsPageRequest = (
                     secondary: {
                         booleans: [
                             { id: "includeRecentReviews", value: true },
-                            { id: "includeRatingsOnlyReviews", value: true },
+                            {
+                                id: "includeRatingsOnlyReviews",
+                                value: true,
+                            },
                             {
                                 id: "overrideEmbargoForIndividualReviews",
                                 value: true,
@@ -95,7 +126,9 @@ const getReviewsPageRequest = (
                         selections: [
                             {
                                 id: "sortBy",
-                                value: "NEWEST_TO_OLDEST_BY_LANGUAGE",
+                                value: sortByToRequestParamMap[
+                                    scrapeSettings.sortBy
+                                ],
                             },
                         ],
                     },
@@ -109,14 +142,20 @@ const getReviewsPageRequest = (
 export const getNextPagesRequests = (
     hotelId: string,
     currentIndex: number | null,
-    maxReviewsPerHotel: number,
+    scrapeSettings: ScrapeSettings,
     customData: any,
     site: string
 ) =>
     new Array(3)
         .fill(undefined)
         .map((_, i) => (currentIndex ?? -PAGE_SIZE) + PAGE_SIZE * (i + 1))
-        .filter((startIndex) => startIndex < maxReviewsPerHotel)
+        .filter((startIndex) => startIndex < scrapeSettings.maxReviewsPerHotel)
         .map((startIndex) =>
-            getReviewsPageRequest(hotelId, startIndex, customData, site)
+            getReviewsPageRequest(
+                hotelId,
+                scrapeSettings,
+                startIndex,
+                customData,
+                site
+            )
         );

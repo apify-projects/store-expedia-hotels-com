@@ -4,16 +4,20 @@ import {
     createCheerioRouter,
     Dataset,
 } from "@crawlee/cheerio";
-import { getNextPagesRequests, LABEL } from "./utils.js";
-import { ExtraContext } from "./main.js";
+import {
+    getNextPagesRequests,
+    LABEL,
+    ScrapeSettings,
+    UserData,
+} from "./utils.js";
 
 export const router = createCheerioRouter<
-    CheerioCrawlingContext & ExtraContext
+    CheerioCrawlingContext & { scrapeSettings: ScrapeSettings }
 >();
 
 router.addHandler(
     LABEL.GET_HOTEL_ID,
-    async ({ request, crawler, $, maxReviewsPerHotel }) => {
+    async ({ request, crawler, $, scrapeSettings }) => {
         const hotelIdsFound = $("script")
             .toArray()
             .flatMap((script) => {
@@ -39,7 +43,7 @@ router.addHandler(
             getNextPagesRequests(
                 hotelIdsFound[0],
                 null,
-                maxReviewsPerHotel,
+                scrapeSettings,
                 request.userData.customData,
                 request.userData.site
             )
@@ -47,27 +51,29 @@ router.addHandler(
     }
 );
 
-router.addHandler(
+router.addHandler<UserData>(
     LABEL.REVIEWS_PAGE,
-    async ({ request, json, crawler, maxReviewsPerHotel }) => {
-        const reviews = json[0].data.propertyInfo.reviewInfo.reviews.slice(
-            0,
-            maxReviewsPerHotel - request.userData.startIndex
-        );
+    async ({ request, json, crawler, scrapeSettings }) => {
+        const reviews: any[] =
+            json[0].data.propertyInfo.reviewInfo.reviews.slice(
+                0,
+                scrapeSettings.maxReviewsPerHotel - request.userData.startIndex
+            );
         if (reviews.length === 0) return;
         await crawler.addRequests(
             getNextPagesRequests(
                 request.userData.hotelId,
                 request.userData.startIndex,
-                maxReviewsPerHotel,
+                scrapeSettings,
                 request.userData.customData,
                 request.userData.site
             )
         );
         await Dataset.pushData(
-            reviews.map((review: any) => ({
+            reviews.map((review, i) => ({
                 ...review,
                 hotelId: request.userData.hotelId,
+                reviewPosition: request.userData.startIndex + i + 1,
                 customData: request.userData.customData,
             }))
         );
