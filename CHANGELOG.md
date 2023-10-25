@@ -1,3 +1,9 @@
+### 2023-10-25 (0.0.13)
+
+_Added_
+
+-   Input option `minDate`: if you select sorting by Most recent, this option will stop scraping after encountering reviews older than the given date.
+
 ### 2023-09-14 (0.0.11)
 
 _Fixes_
