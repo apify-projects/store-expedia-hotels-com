@@ -18,13 +18,29 @@ const input = (await Actor.getInput<{
     maxRequestRetries: number;
     debugLog: boolean;
     sortBy: SortBy;
+    minDate: string;
 }>())!;
+
+let minDate = new Date(input.minDate || "1990-01-01");
+const DEFAULT_DATE = new Date("1990-01-01");
+
+if (
+    input.sortBy !== SortBy.MostRecent &&
+    minDate.toJSON() !== DEFAULT_DATE.toJSON()
+) {
+    minDate = DEFAULT_DATE;
+    log.error(`minDate is only supported for SortBy.MostRecent`);
+    await Actor.setStatusMessage(
+        `minDate is only supported for SortBy.MostRecent, the field will be ignored`
+    );
+}
 
 if (input.debugLog) log.setLevel(log.LEVELS.DEBUG);
 
 const scrapeSettings: ScrapeSettings = {
     sortBy: input.sortBy,
     maxReviewsPerHotel: input.maxReviewsPerHotel,
+    minDate,
 };
 
 const unprocessedRequestList = await RequestList.open(

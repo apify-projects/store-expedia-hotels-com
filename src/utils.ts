@@ -40,6 +40,7 @@ const QUERY = await readFile("src/reviewsQuery.graphql", "utf-8");
 export type ScrapeSettings = {
     sortBy: SortBy;
     maxReviewsPerHotel: number;
+    minDate: Date;
 };
 
 export type UserData = {
@@ -146,7 +147,7 @@ export const getNextPagesRequests = (
     customData: any,
     site: string
 ) =>
-    new Array(3)
+    new Array(5)
         .fill(undefined)
         .map((_, i) => (currentIndex ?? -PAGE_SIZE) + PAGE_SIZE * (i + 1))
         .filter((startIndex) => startIndex < scrapeSettings.maxReviewsPerHotel)

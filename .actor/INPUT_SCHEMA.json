@@ -56,6 +56,14 @@
                 "Highest guest rating",
                 "Lowest guest rating"
             ]
+        },
+        "minDate": {
+            "title": "Only reviews after [YYYY-MM-DD]",
+            "type": "string",
+            "description": "Scrape only reviews after this date. Use format YEAR-MONTH-DAY, e.g. 2019-01-25. Ignored when using any other sorting than Most recent",
+            "default": "1990-01-01",
+            "editor": "textifeld",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
         }
     },
     "required": ["startUrls"]

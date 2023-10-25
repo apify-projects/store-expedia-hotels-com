@@ -56,21 +56,38 @@ router.addHandler(
 router.addHandler<UserData>(
     LABEL.REVIEWS_PAGE,
     async ({ request, json, crawler, scrapeSettings }) => {
-        const reviews: any[] =
+        const allReviews: any[] =
             json[0].data.propertyInfo.reviewInfo.reviews.slice(
                 0,
                 scrapeSettings.maxReviewsPerHotel - request.userData.startIndex
             );
+        const reviews = allReviews.filter((x, i) => {
+            const d = new Date(`${x.submissionTime.longDateFormat} UTC`);
+            if (Number.isNaN(d.getTime())) {
+                log.debug(
+                    `Failed to parse date for review hotelId=${
+                        request.userData.hotelId
+                    };position=${request.userData.startIndex + i + 1} \`${
+                        x.submissionTime.longDateFormat
+                    }\``
+                );
+                return true;
+            }
+            return d.getTime() >= scrapeSettings.minDate.getTime();
+        });
         if (reviews.length === 0) return;
-        await crawler.addRequests(
-            getNextPagesRequests(
-                request.userData.hotelId,
-                request.userData.startIndex,
-                scrapeSettings,
-                request.userData.customData,
-                request.userData.site
-            )
-        );
+
+        // do not search further if we removed any due to date limit
+        if (allReviews.length === reviews.length)
+            await crawler.addRequests(
+                getNextPagesRequests(
+                    request.userData.hotelId,
+                    request.userData.startIndex,
+                    scrapeSettings,
+                    request.userData.customData,
+                    request.userData.site
+                )
+            );
         await Dataset.pushData(
             reviews.map((review, i) => ({
                 ...review,
