@@ -1,3 +1,9 @@
+### 2024-01-02 (0.0.15)
+
+_Added_
+
+- Support other domains of Expedia group, such as `expedia.it`, `expedia.com.tw`, `de.hotels.com` or `hoteis.com`.
+
 ### 2023-10-25 (0.0.13)
 
 _Added_

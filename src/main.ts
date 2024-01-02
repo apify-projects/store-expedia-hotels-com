@@ -2,7 +2,9 @@ import { Actor, log, ProxyConfigurationOptions } from "apify";
 import { CheerioCrawler, RequestList, Source } from "@crawlee/cheerio";
 import { router } from "./handler.js";
 import {
+    EXPEDIA_HOSTNAME,
     getNextPagesRequests,
+    HOTELS_COM_HOSTNAME,
     LABEL,
     ScrapeSettings,
     SITES_CONFIG,
@@ -52,7 +54,13 @@ while (true) {
     const request = await unprocessedRequestList.fetchNextRequest();
     if (!request) break;
 
-    const site = new URL(request.url).hostname;
+    const url = new URL(request.url);
+    let site = url.hostname;
+
+    if (site.endsWith("hotels.com") || site.endsWith("hoteis.com"))
+        site = HOTELS_COM_HOSTNAME;
+    if (site.includes("expedia")) site = EXPEDIA_HOSTNAME;
+
     const config = SITES_CONFIG[site];
     if (config === undefined) {
         log.error(`Unknown site: ${site}`);
@@ -68,7 +76,7 @@ while (true) {
             },
         });
     } else {
-        const match = request.url.match(config.urlRegex);
+        const match = url.pathname.match(config.urlRegex);
         if (!match) {
             log.error(`Could not extract hotel ID from URL: ${request.url}`);
             continue;

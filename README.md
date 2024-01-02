@@ -7,6 +7,7 @@ For each hotel, input a link to the hotel detail page, which will look something
 ```raw
 https://www.expedia.com/Prague-Hotels-Pentahotel-Prague.h525006.Hotel-Information?chkin=2023-03-17&chkout=2023-03-18&x_pwa=1&rfrr=HSR&pwa_ts=1677850168323&sort=RECOMMENDED&top_dp=82&top_cur=USD&userIntent=
 https://www.hotels.com/ho136900/hilton-prague-old-town-prague-czech-republic/?pwaDialogNested=PropertyDetailsReviewsBreakdownDialog
+https://www.expedia.it/en/Berchtesgaden-Hotels-Alpensport-Hotel-Seimler.h2692552.Hotel-Information
 ```
 
 Additionally, you can click on the "Advanced" button in the URL input field and provide any `userData`. Everything provided here will be available on each review as `customData`, to allow later easy identification of which review belongs to which hotel.
@@ -96,7 +97,7 @@ You will get raw review data, so individual reviews will look something like thi
     "hotelId": "123456",
     "customData": {
         "userDataKey1": "your custom data here",
-        "userDataKey2": "any amount of data here"
+        "userDataKey2": ["arbitrary JSON data can be here"]
     }
 }
 ```

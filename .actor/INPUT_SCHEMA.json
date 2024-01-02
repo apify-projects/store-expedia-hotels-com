@@ -10,7 +10,20 @@
             "editor": "requestListSources",
             "prefill": [
                 {
-                    "url": "https://www.expedia.com/Prague-Hotels-Hotel-Krystal.h10966026.Hotel-Information"
+                    "url": "https://www.expedia.com/Prague-Hotels-Hotel-Krystal.h10966026.Hotel-Information",
+                    "method": "GET",
+                    "userData": {
+                        "hotel": "Prague Hotel Krystal",
+                        "doWeEndorseIt": "no opinion"
+                    }
+                },
+                {
+                    "url": "https://www.expedia.it/en/Berchtesgaden-Hotels-Alpensport-Hotel-Seimler.h2692552.Hotel-Information",
+                    "method": "GET",
+                    "userData": {
+                        "your": ["custom", "data", "goes", "here"],
+                        "doWeEndorseThisHotel": "no opinion"
+                    }
                 }
             ]
         },

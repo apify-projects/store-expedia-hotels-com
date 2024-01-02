@@ -1,15 +1,17 @@
 import { randomUUID } from "crypto";
 import { readFile } from "fs/promises";
 
+export const EXPEDIA_HOSTNAME = "www.expedia.com";
+export const HOTELS_COM_HOSTNAME = "www.hotels.com";
 export const SITES_CONFIG: Record<
     string,
     { urlRegex: RegExp | null; siteId: number }
 > = {
-    "www.expedia.com": {
-        urlRegex: /\.h(\d+)\.Hotel-Information/,
+    [EXPEDIA_HOSTNAME]: {
+        urlRegex: /\.h(\d+)\./,
         siteId: 1,
     },
-    "www.hotels.com": {
+    [HOTELS_COM_HOSTNAME]: {
         urlRegex: null,
         siteId: 300000001,
     },
