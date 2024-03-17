@@ -27,12 +27,18 @@
                 }
             ]
         },
+        "maxResults": {
+            "title": "Maximum Results",
+            "type": "integer",
+            "minimum": 1,
+            "prefill": 1000,
+            "description": "Maximum number of reviews to scrape in total. If you keep it empty, there will be no limit"
+        },
         "maxReviewsPerHotel": {
             "title": "Maximum reviews per hotel",
             "type": "integer",
             "minimum": 1,
-            "description": "Maximum number of reviews to scrape per hotel",
-            "default": 99999999
+            "description": "Maximum number of reviews to scrape per hotel. If you keep it empty, there will be no limit"
         },
         "proxyConfiguration": {
             "title": "Proxy configuration",

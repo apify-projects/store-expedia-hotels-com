@@ -1,5 +1,5 @@
 import { Actor, log, ProxyConfigurationOptions } from "apify";
-import { CheerioCrawler, RequestList, Source } from "@crawlee/cheerio";
+import { CheerioCrawler, NonRetryableError, RequestList, Source } from "@crawlee/cheerio";
 import { router } from "./handler.js";
 import {
     EXPEDIA_HOSTNAME,
@@ -16,6 +16,7 @@ await Actor.init();
 const input = (await Actor.getInput<{
     proxyConfiguration: ProxyConfigurationOptions;
     startUrls: Source[];
+    maxResults: number;
     maxReviewsPerHotel: number;
     maxRequestRetries: number;
     debugLog: boolean;
@@ -41,9 +42,15 @@ if (input.debugLog) log.setLevel(log.LEVELS.DEBUG);
 
 const scrapeSettings: ScrapeSettings = {
     sortBy: input.sortBy,
-    maxReviewsPerHotel: input.maxReviewsPerHotel,
     minDate,
+    maxReviewsPerHotel: input.maxReviewsPerHotel || Infinity,
+    maxResults: input.maxResults || Infinity,
+    totalPushedResults: await Actor.getValue('TOTAL_PUSHED_RESULTS') || 0,
 };
+
+const saveState = () => Actor.setValue('TOTAL_PUSHED_RESULTS', scrapeSettings.totalPushedResults);
+Actor.on('persistState', saveState);
+Actor.on('aborting', saveState);
 
 const unprocessedRequestList = await RequestList.open(
     "start-urls",
@@ -105,6 +112,24 @@ const crawler = new CheerioCrawler({
     additionalMimeTypes: ["application/octet-stream"],
     maxRequestRetries: input.maxRequestRetries,
     requestHandler: router as any,
+    preNavigationHooks: [async () => {
+        const maxLimitReached = scrapeSettings.totalPushedResults >= scrapeSettings.maxResults;
+
+        if (maxLimitReached) {
+            const errorMessage = `Reached limit of max crawled places for this search term, skipping all next requests in the queue for this search `
+                + `(this might take a while, don't mind the errors). [Draining request queue]`;
+            if (!scrapeSettings.startedDrainingState === true) {
+                await Actor.setStatusMessage(errorMessage);
+            }
+
+            // We don't want anything to override our status message
+            // @ts-expect-error - this is a hack to override the status message
+            crawler.setStatusMessage = () => { /* do nothing */ };
+
+            scrapeSettings.startedDrainingState = true
+            throw new NonRetryableError(errorMessage);
+        }
+    }],
 });
 
 await crawler.run(processedRequests);
