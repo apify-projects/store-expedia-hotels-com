@@ -44,7 +44,7 @@ const scrapeSettings: ScrapeSettings = {
     sortBy: input.sortBy,
     minDate,
     maxReviewsPerHotel: input.maxReviewsPerHotel || Infinity,
-    maxResults: input.maxResults || Infinity,
+    maxResults: Number(process.env.ACTOR_MAX_PAID_DATASET_ITEMS) || Infinity,
     totalPushedResults: await Actor.getValue('TOTAL_PUSHED_RESULTS') || 0,
 };
 
