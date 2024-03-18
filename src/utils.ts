@@ -1,6 +1,9 @@
 import { randomUUID } from "crypto";
 import { readFile } from "fs/promises";
 
+import { Actor } from "apify";
+import { CheerioCrawler, Request } from "@crawlee/cheerio";
+
 export const EXPEDIA_HOSTNAME = "www.expedia.com";
 export const HOTELS_COM_HOSTNAME = "www.hotels.com";
 export const SITES_CONFIG: Record<
@@ -43,6 +46,9 @@ export type ScrapeSettings = {
     sortBy: SortBy;
     maxReviewsPerHotel: number;
     minDate: Date;
+    maxResults: number;
+    totalPushedResults: number;
+    startedDrainingState?: boolean;
 };
 
 export type UserData = {
@@ -152,7 +158,7 @@ export const getNextPagesRequests = (
     new Array(5)
         .fill(undefined)
         .map((_, i) => (currentIndex ?? -PAGE_SIZE) + PAGE_SIZE * (i + 1))
-        .filter((startIndex) => startIndex < scrapeSettings.maxReviewsPerHotel)
+        .filter((startIndex) => startIndex < scrapeSettings.maxReviewsPerHotel && startIndex < scrapeSettings.maxResults)
         .map((startIndex) =>
             getReviewsPageRequest(
                 hotelId,
@@ -162,3 +168,10 @@ export const getNextPagesRequests = (
                 site
             )
         );
+
+export const abortIfReachedMaxResults = async ({ request, crawler }: { request: Request, crawler: CheerioCrawler }) => {
+    await Actor.setStatusMessage(`Finishing scraping because we reached maxResults --- ${request.url}`);
+    // We need to wait a bit so the pages got processed and data pushed
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await crawler.autoscaledPool?.abort();
+};

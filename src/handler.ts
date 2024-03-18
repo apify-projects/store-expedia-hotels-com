@@ -5,6 +5,7 @@ import {
     Dataset,
 } from "@crawlee/cheerio";
 import {
+    abortIfReachedMaxResults,
     getNextPagesRequests,
     LABEL,
     ScrapeSettings,
@@ -40,27 +41,32 @@ router.addHandler(
             );
         } else {
             log.info(`Found hotel ID ${hotelIdsFound[0]} on ${request.url}`);
+        };
+
+        if (scrapeSettings.totalPushedResults >= scrapeSettings.maxResults) {
+            await abortIfReachedMaxResults({ request, crawler });
+        } else {
+            await crawler.addRequests(
+                getNextPagesRequests(
+                    hotelIdsFound[0],
+                    null,
+                    scrapeSettings,
+                    request.userData.customData,
+                    request.userData.site
+                )
+            );
         }
-        await crawler.addRequests(
-            getNextPagesRequests(
-                hotelIdsFound[0],
-                null,
-                scrapeSettings,
-                request.userData.customData,
-                request.userData.site
-            )
-        );
     }
 );
 
 router.addHandler<UserData>(
     LABEL.REVIEWS_PAGE,
     async ({ request, json, crawler, scrapeSettings }) => {
+
         const allReviews: any[] =
-            json[0].data.propertyInfo.reviewInfo.reviews.slice(
-                0,
-                scrapeSettings.maxReviewsPerHotel - request.userData.startIndex
-            );
+            json[0].data.propertyInfo.reviewInfo.reviews
+                .slice(0, scrapeSettings.maxReviewsPerHotel - request.userData.startIndex)
+                .slice(0, scrapeSettings.maxResults - scrapeSettings.totalPushedResults);
         const reviews = allReviews.filter((x, i) => {
             const d = new Date(`${x.submissionTime.longDateFormat} UTC`);
             if (Number.isNaN(d.getTime())) {
@@ -78,7 +84,7 @@ router.addHandler<UserData>(
         if (reviews.length === 0) return;
 
         // do not search further if we removed any due to date limit
-        if (allReviews.length === reviews.length)
+        if (allReviews.length === reviews.length) {
             await crawler.addRequests(
                 getNextPagesRequests(
                     request.userData.hotelId,
@@ -88,18 +94,25 @@ router.addHandler<UserData>(
                     request.userData.site
                 )
             );
-        await Dataset.pushData(
-            reviews.map((review, i) => ({
-                ...review,
-                hotelId: request.userData.hotelId,
-                reviewPosition: request.userData.startIndex + i + 1,
-                customData: request.userData.customData,
-            }))
-        );
-        log.info(
-            `Extracted reviews ${request.userData.startIndex + 1}-${
-                request.userData.startIndex + reviews.length
-            } for hotel ${request.userData.hotelId}`
-        );
+        }
+
+        if (scrapeSettings.totalPushedResults >= scrapeSettings.maxResults) {
+            await abortIfReachedMaxResults({ request, crawler });
+        } else {
+            scrapeSettings.totalPushedResults += reviews.length;
+            await Dataset.pushData(
+                reviews.map((review, i) => ({
+                    ...review,
+                    hotelId: request.userData.hotelId,
+                    reviewPosition: request.userData.startIndex + i + 1,
+                    customData: request.userData.customData,
+                }))
+            );
+            log.info(
+                `Extracted reviews ${request.userData.startIndex + 1}-${
+                    request.userData.startIndex + reviews.length
+                } for hotel ${request.userData.hotelId}`
+            );
+        }
     }
 );
