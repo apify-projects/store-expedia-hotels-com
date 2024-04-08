@@ -1,4 +1,4 @@
-import { Actor, log, ProxyConfigurationOptions } from "apify";
+import { Actor, log } from "apify";
 import { CheerioCrawler, NonRetryableError, RequestList, Source } from "@crawlee/cheerio";
 import { router } from "./handler.js";
 import {
@@ -14,14 +14,13 @@ import {
 await Actor.init();
 
 const input = (await Actor.getInput<{
-    proxyConfiguration: ProxyConfigurationOptions;
     startUrls: Source[];
-    maxResults: number;
     maxReviewsPerHotel: number;
-    maxRequestRetries: number;
-    debugLog: boolean;
     sortBy: SortBy;
     minDate: string;
+
+    // not in schema
+    debugLog: boolean;
 }>())!;
 
 let minDate = new Date(input.minDate || "1990-01-01");
@@ -105,12 +104,10 @@ router.use((ctx) => {
 });
 
 const crawler = new CheerioCrawler({
-    proxyConfiguration: await Actor.createProxyConfiguration(
-        input.proxyConfiguration
-    ),
-    // temporary workaround for https://github.com/apify/crawlee/issues/1994
-    additionalMimeTypes: ["application/octet-stream"],
-    maxRequestRetries: input.maxRequestRetries,
+    proxyConfiguration: await Actor.createProxyConfiguration({
+        groups: ["RESIDENTIAL"],
+    }),
+    maxRequestRetries: 8,
     requestHandler: router as any,
     preNavigationHooks: [async () => {
         const maxLimitReached = scrapeSettings.totalPushedResults >= scrapeSettings.maxResults;
