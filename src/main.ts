@@ -1,5 +1,5 @@
 import { Actor, log } from "apify";
-import { CheerioCrawler, NonRetryableError, RequestList, Source } from "@crawlee/cheerio";
+import { CheerioCrawler, RequestList, Source } from "@crawlee/cheerio";
 import { router } from "./handler.js";
 import {
     EXPEDIA_HOSTNAME,
@@ -44,12 +44,8 @@ const scrapeSettings: ScrapeSettings = {
     minDate,
     maxReviewsPerHotel: input.maxReviewsPerHotel || Infinity,
     maxResults: Number(process.env.ACTOR_MAX_PAID_DATASET_ITEMS) || Infinity,
-    totalPushedResults: await Actor.getValue('TOTAL_PUSHED_RESULTS') || 0,
+    state: await Actor.useState("STATE", { pushedResults: 0 }),
 };
-
-const saveState = () => Actor.setValue('TOTAL_PUSHED_RESULTS', scrapeSettings.totalPushedResults);
-Actor.on('persistState', saveState);
-Actor.on('aborting', saveState);
 
 const unprocessedRequestList = await RequestList.open(
     "start-urls",
@@ -109,24 +105,6 @@ const crawler = new CheerioCrawler({
     }),
     maxRequestRetries: 8,
     requestHandler: router as any,
-    preNavigationHooks: [async () => {
-        const maxLimitReached = scrapeSettings.totalPushedResults >= scrapeSettings.maxResults;
-
-        if (maxLimitReached) {
-            const errorMessage = `Reached limit of max crawled places for this search term, skipping all next requests in the queue for this search `
-                + `(this might take a while, don't mind the errors). [Draining request queue]`;
-            if (!scrapeSettings.startedDrainingState === true) {
-                await Actor.setStatusMessage(errorMessage);
-            }
-
-            // We don't want anything to override our status message
-            // @ts-expect-error - this is a hack to override the status message
-            crawler.setStatusMessage = () => { /* do nothing */ };
-
-            scrapeSettings.startedDrainingState = true
-            throw new NonRetryableError(errorMessage);
-        }
-    }],
 });
 
 await crawler.run(processedRequests);
