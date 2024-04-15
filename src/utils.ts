@@ -43,6 +43,8 @@ export type ScrapeSettings = {
     sortBy: SortBy;
     maxReviewsPerHotel: number;
     minDate: Date;
+    maxResults: number;
+    state: { pushedResults: number };
 };
 
 export type UserData = {
@@ -152,7 +154,11 @@ export const getNextPagesRequests = (
     new Array(5)
         .fill(undefined)
         .map((_, i) => (currentIndex ?? -PAGE_SIZE) + PAGE_SIZE * (i + 1))
-        .filter((startIndex) => startIndex < scrapeSettings.maxReviewsPerHotel)
+        .filter(
+            (startIndex) =>
+                startIndex < scrapeSettings.maxReviewsPerHotel &&
+                startIndex < scrapeSettings.maxResults
+        )
         .map((startIndex) =>
             getReviewsPageRequest(
                 hotelId,
