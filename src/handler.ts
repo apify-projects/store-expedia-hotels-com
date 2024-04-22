@@ -2,7 +2,6 @@ import { Actor, log } from "apify";
 import {
     CheerioCrawlingContext,
     createCheerioRouter,
-    Dataset,
 } from "@crawlee/cheerio";
 import {
     getNextPagesRequests,
@@ -90,7 +89,7 @@ router.addHandler<UserData>(
         // only search further if we didn't remove any reviews due to date/count limits
         const shouldEnqueueNext = allReviews.length === reviews.length;
 
-        await Dataset.pushData(
+        await Actor.pushData(
             reviews.map((review, i) => ({
                 ...review,
                 hotelId: request.userData.hotelId,
