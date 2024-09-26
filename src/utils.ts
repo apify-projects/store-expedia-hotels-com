@@ -89,38 +89,49 @@ const getReviewsPageRequest = (
             variables: {
                 context: {
                     siteId: SITES_CONFIG[site].siteId,
-                    locale: "en_US",
-                    eapid: 0,
                     currency: "USD",
                     device: { type: "DESKTOP" },
-                    identity: {
-                        duaid: randomUUID(),
-                        expUserId: "-1",
-                        tuid: "-1",
-                        authState: "ANONYMOUS",
-                    },
-                    privacyTrackingState: "CAN_NOT_TRACK",
                     debugContext: {
                         abacusOverrides: [],
-                        alterMode: "RELEASED",
                     },
+                    eapid: 1,
+                    identity: {
+                        authState: "ANONYMOUS",
+                        duaid: randomUUID(),
+                    },
+                    locale: "en_US",
+                    privacyTrackingState: "CAN_TRACK",
+                    tpid: 3001, // todo: check if this is different for expedia (this is from hotels.com)
                 },
                 propertyId: hotelId,
                 searchCriteria: {
                     primary: {
                         dateRange: null,
-                        rooms: [],
-                        destination: { regionId: null },
+                        destination: {
+                            regionId: "178279",
+                        },
+                        rooms: [
+                            {
+                                adults: 2,
+                            },
+                        ],
                     },
                     secondary: {
                         booleans: [
-                            { id: "includeRecentReviews", value: true },
+                            {
+                                id: "includeRecentReviews",
+                                value: true,
+                            },
                             {
                                 id: "includeRatingsOnlyReviews",
                                 value: true,
                             },
                             {
                                 id: "overrideEmbargoForIndividualReviews",
+                                value: true,
+                            },
+                            {
+                                id: "isFilteredSummary",
                                 value: true,
                             },
                         ],
