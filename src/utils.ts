@@ -89,32 +89,26 @@ const getReviewsPageRequest = (
             variables: {
                 context: {
                     siteId: SITES_CONFIG[site].siteId,
+                    locale: "en_US",
+                    eapid: 1,
                     currency: "USD",
                     device: { type: "DESKTOP" },
+                    identity: {
+                        duaid: randomUUID(),
+                        authState: "ANONYMOUS",
+                    },
+                    privacyTrackingState: "CAN_NOT_TRACK",
                     debugContext: {
                         abacusOverrides: [],
                     },
-                    eapid: 1,
-                    identity: {
-                        authState: "ANONYMOUS",
-                        duaid: randomUUID(),
-                    },
-                    locale: "en_US",
-                    privacyTrackingState: "CAN_TRACK",
-                    tpid: 3001, // todo: check if this is different for expedia (this is from hotels.com)
+                    // tpid: 3001 - hotels firefox+chrome / tpid: 1, - expedia firefox / tpid: 4400 - expedia chrome
                 },
                 propertyId: hotelId,
                 searchCriteria: {
                     primary: {
                         dateRange: null,
-                        destination: {
-                            regionId: "178279",
-                        },
-                        rooms: [
-                            {
-                                adults: 2,
-                            },
-                        ],
+                        rooms: [],
+                        destination: { regionId: null },
                     },
                     secondary: {
                         booleans: [
@@ -128,10 +122,6 @@ const getReviewsPageRequest = (
                             },
                             {
                                 id: "overrideEmbargoForIndividualReviews",
-                                value: true,
-                            },
-                            {
-                                id: "isFilteredSummary",
                                 value: true,
                             },
                         ],
