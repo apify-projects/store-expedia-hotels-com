@@ -18,6 +18,8 @@ query PropertyFilteredReviewsQuery(
             sortAndFilter {
                 ...TravelerTypeFragment
                 ...SortTypeFragment
+                ...SearchTextFragment
+                ...PopularMentionsFragment
                 __typename
             }
             __typename
@@ -28,7 +30,10 @@ query PropertyFilteredReviewsQuery(
 
 fragment __PropertyReviewSummaryFragment on PropertyReviewSummary {
     accessibilityLabel
-    overallScoreWithDescription
+    overallScoreWithDescriptionA11y {
+        ...LodgingEnrichedMessageFragment
+        __typename
+    }
     propertyReviewCountDetails {
         fullDescription
         __typename
@@ -49,6 +54,12 @@ fragment __PropertyReviewSummaryFragment on PropertyReviewSummary {
 
 fragment ReviewDisclaimerFragment on PropertyReviewSummary {
     reviewDisclaimer
+    reviewDisclaimerHeading
+    strategy
+    reviewDisclaimerValues {
+        text
+        __typename
+    }
     reviewDisclaimerLabel
     reviewDisclaimerAnalytics {
         referrerId
@@ -66,6 +77,33 @@ fragment ReviewDisclaimerFragment on PropertyReviewSummary {
     }
     reviewDisclaimerAccessibilityLabel
     __typename
+}
+
+fragment LodgingEnrichedMessageFragment on LodgingEnrichedMessage {
+    __typename
+    subText
+    subtexts
+    value
+    theme
+    state
+    accessibilityLabel
+    icon {
+        id
+        size
+        theme
+        __typename
+    }
+    mark {
+        id
+        __typename
+    }
+    egdsMark {
+        url {
+            value
+            __typename
+        }
+        __typename
+    }
 }
 
 fragment __PropertyReviewsListFragment on PropertyReviews {
@@ -95,6 +133,7 @@ fragment __PropertyReviewsListFragment on PropertyReviews {
         }
         __typename
     }
+    impressionAnalytics
     ...NoResultsMessageFragment
     __typename
 }
@@ -105,12 +144,17 @@ fragment ReviewParentFragment on PropertyReview {
     locale
     title
     brandType
+    disclaimer
     reviewScoreWithDescription {
         label
         value
         __typename
     }
     text
+    highlightedText {
+        ...EGDSSpannableTextFragment
+        __typename
+    }
     seeMoreAnalytics {
         linkName
         referrerId
@@ -133,6 +177,7 @@ fragment ReviewParentFragment on PropertyReview {
         ...PropertyReviewFooterSectionFragment
         __typename
     }
+    reviewAnalytics
     ...FeedbackIndicatorFragment
     ...AuthorFragment
     ...PhotosFragment
@@ -165,6 +210,11 @@ fragment PhotosFragment on PropertyReview {
             __typename
         }
         navClickAnalytics {
+            referrerId
+            linkName
+            __typename
+        }
+        intersectionAnalytics {
             referrerId
             linkName
             __typename
@@ -296,6 +346,88 @@ fragment PropertyReviewFooterSectionFragment on PropertyReviewFooterSection {
     __typename
 }
 
+fragment EGDSSpannableTextFragment on EGDSSpannableText {
+    text
+    contents {
+        ...EGDSSpannableTextContentFragment
+        __typename
+    }
+    inlineContent {
+        ...EGDSSpannableTextContentFragment
+        __typename
+    }
+    egdsElementId
+    __typename
+}
+
+fragment EGDSSpannableTextContentFragment on EGDSText {
+    ...EGDSStylizedTextFragment
+    ...EGDSPlainTextFragment
+    ...LodgingEGDSGraphicTextFragment
+    ...EGDSInlineLinkFragment
+    __typename
+}
+
+fragment EGDSStylizedTextFragment on EGDSStylizedText {
+    __typename
+    text
+    theme
+    weight
+    size
+    decorative
+    accessibility
+}
+
+fragment EGDSPlainTextFragment on EGDSPlainText {
+    text
+    __typename
+}
+
+fragment EGDSInlineLinkFragment on EGDSInlineLink {
+    action {
+        accessibility
+        analytics {
+            linkName
+            referrerId
+            __typename
+        }
+        resource {
+            value
+            __typename
+        }
+        target
+        __typename
+    }
+    disabled
+    sizeEGDSLink: size
+    text
+    __typename
+}
+
+fragment LodgingEGDSGraphicTextFragment on EGDSGraphicText {
+    accessibility
+    text
+    graphic {
+        ... on Icon {
+            id
+            size
+            __typename
+        }
+        ... on Mark {
+            url {
+                ... on HttpURI {
+                    value
+                    __typename
+                }
+                __typename
+            }
+            __typename
+        }
+        __typename
+    }
+    __typename
+}
+
 fragment ReviewChildFragment on ManagementResponse {
     id
     header {
@@ -339,6 +471,11 @@ fragment TravelerTypeFragment on SortAndFilterViewModel {
     sortAndFilter {
         name
         label
+        clickAnalytics {
+            linkName
+            referrerId
+            __typename
+        }
         options {
             label
             isSelected
@@ -375,6 +512,61 @@ fragment SortTypeFragment on SortAndFilterViewModel {
                 referrerId
                 __typename
             }
+            __typename
+        }
+        __typename
+    }
+    __typename
+}
+
+fragment SearchTextFragment on SortAndFilterViewModel {
+    sortAndFilter {
+        name
+        label
+        graphic {
+            ...SearchTextIconFragment
+            __typename
+        }
+        submittedAnalytics
+        initiatedAnalytics
+        __typename
+    }
+    __typename
+}
+
+fragment SearchTextIconFragment on Icon {
+    description
+    id
+    token
+    __typename
+}
+
+fragment PopularMentionsFragment on SortAndFilterViewModel {
+    sortAndFilter {
+        title
+        placeholder
+        label
+        name
+        showListOptions {
+            seeLessLabel
+            seeMoreLabel
+            __typename
+        }
+        options {
+            ariaLabel
+            clickAnalytics {
+                referrerId
+                linkName
+                __typename
+            }
+            optionValue
+            label
+            isSelected
+            __typename
+        }
+        clickAnalytics {
+            referrerId
+            linkName
             __typename
         }
         __typename

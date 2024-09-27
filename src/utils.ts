@@ -90,20 +90,18 @@ const getReviewsPageRequest = (
                 context: {
                     siteId: SITES_CONFIG[site].siteId,
                     locale: "en_US",
-                    eapid: 0,
+                    eapid: 1,
                     currency: "USD",
                     device: { type: "DESKTOP" },
                     identity: {
                         duaid: randomUUID(),
-                        expUserId: "-1",
-                        tuid: "-1",
                         authState: "ANONYMOUS",
                     },
                     privacyTrackingState: "CAN_NOT_TRACK",
                     debugContext: {
                         abacusOverrides: [],
-                        alterMode: "RELEASED",
                     },
+                    // tpid: 3001 - hotels firefox+chrome / tpid: 1, - expedia firefox / tpid: 4400 - expedia chrome
                 },
                 propertyId: hotelId,
                 searchCriteria: {
@@ -114,7 +112,10 @@ const getReviewsPageRequest = (
                     },
                     secondary: {
                         booleans: [
-                            { id: "includeRecentReviews", value: true },
+                            {
+                                id: "includeRecentReviews",
+                                value: true,
+                            },
                             {
                                 id: "includeRatingsOnlyReviews",
                                 value: true,
