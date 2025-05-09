@@ -3,6 +3,7 @@ import { readFile } from "fs/promises";
 
 export const EXPEDIA_HOSTNAME = "www.expedia.com";
 export const HOTELS_COM_HOSTNAME = "www.hotels.com";
+export const VRBO_COM_HOSTNAME = "www.vrbo.com";
 export const SITES_CONFIG: Record<
     string,
     { urlRegex: RegExp | null; siteId: number }
@@ -15,6 +16,10 @@ export const SITES_CONFIG: Record<
         urlRegex: null,
         siteId: 300000001,
     },
+    [VRBO_COM_HOSTNAME]: {
+        urlRegex: null, // Regex to extract the property ID from a long URL
+        siteId: 9001001, // Site ID used in the GraphQL request
+    }
 };
 
 export enum LABEL {

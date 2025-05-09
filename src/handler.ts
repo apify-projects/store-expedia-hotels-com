@@ -4,11 +4,14 @@ import {
     createCheerioRouter,
 } from "@crawlee/cheerio";
 import {
-    getNextPagesRequests,
+    getNextPagesRequests, HOTELS_COM_HOSTNAME,
     LABEL,
     ScrapeSettings,
     UserData,
-} from "./utils.js";
+    VRBO_COM_HOSTNAME,
+} from './utils.js';
+import { vrboHandler } from "./sub-handlers/vrbo-handler.js";
+import { hotelsHandler } from "./sub-handlers/hotels-handler.js";
 
 export const router = createCheerioRouter<
     CheerioCrawlingContext & { scrapeSettings: ScrapeSettings }
@@ -16,40 +19,10 @@ export const router = createCheerioRouter<
 
 router.addHandler(
     LABEL.GET_HOTEL_ID,
-    async ({ request, crawler, $, scrapeSettings }) => {
-        const hotelIdsFound = $("script")
-            .toArray()
-            .flatMap((script) => {
-                const text = $(script).text();
-                const match = text.match(
-                    /"propertyId\\\\\\"\s*:\s*\\\\\\"(\d+)\\\\\\"/
-                );
-                if (match) return [match[1]];
-                return [];
-            });
-        if (hotelIdsFound.length === 0) {
-            request.noRetry = true;
-            throw new Error(`Could not extract hotel ID from ${request.url}`);
-        }
-        if (hotelIdsFound.length > 1) {
-            log.warning(
-                `Found multiple hotel IDs on ${
-                    request.url
-                }: ${hotelIdsFound.join(", ")}`
-            );
-        } else {
-            log.info(`Found hotel ID ${hotelIdsFound[0]} on ${request.url}`);
-        }
-
-        await crawler.addRequests(
-            getNextPagesRequests(
-                hotelIdsFound[0],
-                null,
-                scrapeSettings,
-                request.userData.customData,
-                request.userData.site
-            )
-        );
+    async (ctx) => {
+        const { request } = ctx;
+        if (request.userData.site === VRBO_COM_HOSTNAME) await vrboHandler(ctx);
+        if (request.userData.site === HOTELS_COM_HOSTNAME) await hotelsHandler(ctx);
     }
 );
 

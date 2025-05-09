@@ -9,6 +9,7 @@ import {
     ScrapeSettings,
     SITES_CONFIG,
     SortBy,
+    VRBO_COM_HOSTNAME,
 } from "./utils.js";
 
 await Actor.init();
@@ -62,6 +63,7 @@ while (true) {
     if (site.endsWith("hotels.com") || site.endsWith("hoteis.com"))
         site = HOTELS_COM_HOSTNAME;
     if (site.includes("expedia")) site = EXPEDIA_HOSTNAME;
+    if (site.includes("vrbo")) site = VRBO_COM_HOSTNAME;
 
     const config = SITES_CONFIG[site];
     if (config === undefined) {
@@ -78,7 +80,7 @@ while (true) {
             },
         });
     } else {
-        const match = url.pathname.match(config.urlRegex);
+        const match =  url.pathname.match(config.urlRegex);
         if (!match) {
             log.error(`Could not extract hotel ID from URL: ${request.url}`);
             continue;
