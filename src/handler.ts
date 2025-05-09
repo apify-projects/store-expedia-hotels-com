@@ -10,7 +10,7 @@ import {
     ScrapeSettings,
     UserData,
     VRBO_COM_HOSTNAME,
-} from './utils.js';
+} from "./utils.js";
 import { vrboHandler } from "./sub-handlers/vrbo-handler.js";
 import { hotelsHandler } from "./sub-handlers/hotels-handler.js";
 
