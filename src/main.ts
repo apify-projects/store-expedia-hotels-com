@@ -80,7 +80,7 @@ while (true) {
             },
         });
     } else {
-        const match =  url.pathname.match(config.urlRegex);
+        const match = url.pathname.match(config.urlRegex);
         if (!match) {
             log.error(`Could not extract hotel ID from URL: ${request.url}`);
             continue;

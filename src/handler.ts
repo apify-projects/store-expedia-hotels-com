@@ -4,7 +4,8 @@ import {
     createCheerioRouter,
 } from "@crawlee/cheerio";
 import {
-    getNextPagesRequests, HOTELS_COM_HOSTNAME,
+    getNextPagesRequests,
+    HOTELS_COM_HOSTNAME,
     LABEL,
     ScrapeSettings,
     UserData,
