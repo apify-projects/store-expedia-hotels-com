@@ -105,7 +105,7 @@ const crawler = new CheerioCrawler({
     proxyConfiguration: await Actor.createProxyConfiguration({
         groups: ["RESIDENTIAL"],
     }),
-    maxRequestRetries: 8,
+    maxRequestRetries: 25,
     requestHandler: router as any,
 });
 
