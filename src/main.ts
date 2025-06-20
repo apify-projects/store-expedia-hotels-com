@@ -102,10 +102,17 @@ router.use((ctx) => {
 });
 
 const crawler = new CheerioCrawler({
+    maxConcurrency: 40,
+        sessionPoolOptions: {
+        maxPoolSize: 20,
+        sessionOptions: {
+            maxUsageCount: 10,
+        },
+    },
     proxyConfiguration: await Actor.createProxyConfiguration({
-        groups: ["RESIDENTIAL"],
+        groups: ["SHADER", "BUYPROXIES94952"],
     }),
-    maxRequestRetries: 25,
+    maxRequestRetries: 50,
     requestHandler: router as any,
 });
 
