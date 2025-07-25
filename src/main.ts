@@ -116,5 +116,14 @@ const crawler = new CheerioCrawler({
     requestHandler: router as any,
 });
 
+// Turn off retry warnings for all 400 status codes because they are off putting to users 
+const originalWarningLog = crawler.log.warning.bind(crawler.log);
+crawler.log.warning = (message: string, data?: Record<string, unknown> | null) => {
+    if (message.includes('Reclaiming failed request') && message.includes('received 4')) {
+        return;
+    }
+    originalWarningLog(message, data);
+};
+
 await crawler.run(processedRequests);
 await Actor.exit();
