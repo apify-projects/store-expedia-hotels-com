@@ -4,7 +4,7 @@
     "type": "module",
     "description": "This is a boilerplate of an Apify actor.",
     "engines": {
-        "node": ">=20.0.0"
+        "node": ">=22.0.0"
     },
     "dependencies": {
         "@crawlee/cheerio": "^3.14.0",
@@ -13,6 +13,7 @@
     "devDependencies": {
         "@apify/eslint-config-ts": "^0.3.0",
         "@apify/tsconfig": "^0.1.0",
+        "@types/node": "^24.1.0",
         "@typescript-eslint/eslint-plugin": "^7.6.0",
         "@typescript-eslint/parser": "^7.6.0",
         "eslint": "^8.20.0",
