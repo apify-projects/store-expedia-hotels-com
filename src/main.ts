@@ -11,8 +11,11 @@ import {
     SortBy,
     VRBO_COM_HOSTNAME,
 } from "./utils.js";
+import { chargeEvent, PPE_EVENTS } from "./pricing.js";
 
 await Actor.init();
+
+await chargeEvent({ eventName: PPE_EVENTS.START, skipIfAlreadyCharged: true });
 
 const input = (await Actor.getInput<{
     startUrls: Source[];
