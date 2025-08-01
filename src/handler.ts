@@ -13,6 +13,7 @@ import {
 } from "./utils.js";
 import { vrboHandler } from "./sub-handlers/vrbo-handler.js";
 import { hotelsHandler } from "./sub-handlers/hotels-handler.js";
+import { pushReviews } from "./pricing.js";
 
 export const router = createCheerioRouter<
     CheerioCrawlingContext & { scrapeSettings: ScrapeSettings }
@@ -63,7 +64,7 @@ router.addHandler<UserData>(
         // only search further if we didn't remove any reviews due to date/count limits
         const shouldEnqueueNext = allReviews.length === reviews.length;
 
-        await Actor.pushData(
+        const { chargeLimitReached } = await pushReviews(
             reviews.map((review, i) => ({
                 ...review,
                 hotelId: request.userData.hotelId,
@@ -71,6 +72,8 @@ router.addHandler<UserData>(
                 customData: request.userData.customData,
             }))
         );
+        if (chargeLimitReached) await crawler.autoscaledPool?.abort();
+
         scrapeSettings.state.pushedResults += reviews.length;
 
         log.info(
