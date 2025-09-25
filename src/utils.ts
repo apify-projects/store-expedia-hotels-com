@@ -41,7 +41,7 @@ const sortByToRequestParamMap: Record<SortBy, string> = {
     [SortBy.LowestGuestRating]: "LOWEST_TO_HIGHEST_RATED",
 };
 
-export const PAGE_SIZE = 10;
+export const PAGE_SIZE = 100;
 const QUERY = await readFile("src/reviewsQuery.graphql", "utf-8");
 
 export type ScrapeSettings = {
