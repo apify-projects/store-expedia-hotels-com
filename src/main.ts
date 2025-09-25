@@ -106,7 +106,8 @@ router.use((ctx) => {
 
 const crawler = new CheerioCrawler({
     maxConcurrency: 40,
-        sessionPoolOptions: {
+    navigationTimeoutSecs: 20,
+    sessionPoolOptions: {
         maxPoolSize: 20,
         sessionOptions: {
             maxUsageCount: 10,
@@ -115,7 +116,15 @@ const crawler = new CheerioCrawler({
     proxyConfiguration: await Actor.createProxyConfiguration({
         groups: ["SHADER", "BUYPROXIES94952"],
     }),
-    maxRequestRetries: 50,
+    preNavigationHooks: [
+        async (_, gotOptions) => {
+            gotOptions.headerGeneratorOptions = {
+                devices: ['desktop'],
+                locale: ['en-US']
+            };
+        },
+    ],
+    maxRequestRetries: 70,
     requestHandler: router as any,
 });
 
@@ -129,4 +138,5 @@ crawler.log.warning = (message: string, data?: Record<string, unknown> | null) =
 };
 
 await crawler.run(processedRequests);
+
 await Actor.exit();
