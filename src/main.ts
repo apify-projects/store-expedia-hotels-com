@@ -114,7 +114,7 @@ const crawler = new CheerioCrawler({
         },
     },
     proxyConfiguration: await Actor.createProxyConfiguration({
-        groups: ["RESIDENTIAL"],
+        groups: ["SHADER", "BUYPROXIES94952"],
     }),
     preNavigationHooks: [
         async (_, gotOptions) => {
