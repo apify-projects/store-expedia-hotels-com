@@ -1,46 +1,59 @@
 import { Actor, log } from "apify";
-import { CheerioCrawler, RequestList, Source } from "@crawlee/cheerio";
-import { router } from "./handler.js";
 import {
-    EXPEDIA_HOSTNAME,
-    getNextPagesRequests,
-    HOTELS_COM_HOSTNAME,
-    LABEL,
+    buildReviewsBody,
+    hotelIdFromHtml,
+    hotelIdFromUrl,
+    PAGE_SIZE,
+    resolveSite,
     ScrapeSettings,
     SITES_CONFIG,
     SortBy,
-    VRBO_COM_HOSTNAME,
 } from "./utils.js";
-import { chargeEvent, PPE_EVENTS } from "./pricing.js";
+import { chargeEvent, PPE_EVENTS, pushReviews } from "./pricing.js";
+import { directFetch, ghostFetch, GhostFetchOptions, GhostFetchResponse, initDirect, MOBILE_HEADERS } from "./ghost-fetch-client.js";
+import { normalizeReview } from "./normalize.js";
 
 await Actor.init();
-
 await chargeEvent({ eventName: PPE_EVENTS.START, skipIfAlreadyCharged: true });
 
 const input = (await Actor.getInput<{
-    startUrls: Source[];
+    startUrls: { url: string; userData?: Record<string, unknown> }[];
     maxReviewsPerHotel: number;
     sortBy: SortBy;
     minDate: string;
-
-    // not in schema
     debugLog: boolean;
+    transport?: "ghost-fetch" | "direct";
+    proxyGroups?: string[];
+    proxyCountry?: string;
 }>())!;
+
+// Transport selection. Default: ghost-fetch (residential, proven). Set
+// transport=direct + proxyGroups (e.g. ["DATACENTER"]) to test cheaper pools
+// via in-actor impit through the Apify proxy.
+let fetchUrl: (url: string, opts?: GhostFetchOptions) => Promise<GhostFetchResponse> = ghostFetch;
+if (input.transport === "direct") {
+    // Apify datacenter is the default pool (no group). Pass proxyGroups only for
+    // RESIDENTIAL etc. Empty/["DATACENTER"] => datacenter.
+    const groups = (input.proxyGroups ?? []).filter((g) => g && g.toUpperCase() !== "DATACENTER");
+    const proxyConfiguration = await Actor.createProxyConfiguration({
+        ...(groups.length ? { groups } : {}),
+        ...(input.proxyCountry ? { countryCode: input.proxyCountry } : {}),
+    });
+    const proxyUrl = await proxyConfiguration?.newUrl("expediamobile");
+    initDirect(proxyUrl);
+    fetchUrl = directFetch;
+    log.info(`Transport: direct impit via Apify proxy groups=${groups.length ? groups.join(",") : "DATACENTER(default)"}`);
+} else {
+    log.info(`Transport: ghost-fetch (residential)`);
+}
 
 let minDate = new Date(input.minDate || "1990-01-01");
 const DEFAULT_DATE = new Date("1990-01-01");
-
-if (
-    input.sortBy !== SortBy.MostRecent &&
-    minDate.toJSON() !== DEFAULT_DATE.toJSON()
-) {
+if (input.sortBy !== SortBy.MostRecent && minDate.toJSON() !== DEFAULT_DATE.toJSON()) {
     minDate = DEFAULT_DATE;
     log.error(`minDate is only supported for SortBy.MostRecent`);
-    await Actor.setStatusMessage(
-        `minDate is only supported for SortBy.MostRecent, the field will be ignored`
-    );
+    await Actor.setStatusMessage(`minDate is only supported for SortBy.MostRecent, the field will be ignored`);
 }
-
 if (input.debugLog) log.setLevel(log.LEVELS.DEBUG);
 
 const scrapeSettings: ScrapeSettings = {
@@ -51,92 +64,128 @@ const scrapeSettings: ScrapeSettings = {
     state: await Actor.useState("STATE", { pushedResults: 0 }),
 };
 
-const unprocessedRequestList = await RequestList.open(
-    "start-urls",
-    input.startUrls
-);
-const processedRequests = [];
-while (true) {
-    const request = await unprocessedRequestList.fetchNextRequest();
-    if (!request) break;
+let stop = false;
 
-    const url = new URL(request.url);
-    let site = url.hostname;
+// Resolve the property id. Expedia/VRBO carry it in the URL; Hotels.com needs a
+// page fetch (mobile UA) to read it from the embedded data.
+async function resolveHotelId(rawUrl: string, site: string, session: string): Promise<string | null> {
+    const url = new URL(rawUrl);
+    const fromUrl = hotelIdFromUrl(url, site);
+    if (fromUrl) return fromUrl;
+    const res = await fetchUrl(rawUrl, { headers: MOBILE_HEADERS, session, country: "US" });
+    return hotelIdFromHtml(res.content);
+}
 
-    if (site.endsWith("hotels.com") || site.endsWith("hoteis.com"))
-        site = HOTELS_COM_HOSTNAME;
-    if (site.includes("expedia")) site = EXPEDIA_HOSTNAME;
-    if (site.includes("vrbo")) site = VRBO_COM_HOSTNAME;
-
-    const config = SITES_CONFIG[site];
-    if (config === undefined) {
-        log.error(`Unknown site: ${site}`);
-        continue;
+async function scrapeHotel(rawUrl: string, customData: Record<string, unknown>) {
+    let url: URL;
+    try {
+        url = new URL(rawUrl.trim());
+    } catch {
+        log.error(`Invalid URL: ${rawUrl}`);
+        return;
     }
-    if (config.urlRegex === null) {
-        processedRequests.push({
-            url: request.url,
-            userData: {
-                site,
-                label: LABEL.GET_HOTEL_ID,
-                customData: request.userData,
-            },
+    const site = resolveSite(url.hostname);
+    if (!SITES_CONFIG[site]) {
+        log.error(`Unknown site: ${site} (${rawUrl})`);
+        return;
+    }
+    const session = `exp${site.replace(/[^a-z0-9]/gi, "")}${(url.pathname.match(/\d+/g)?.join("") ?? "").slice(-12)}`;
+
+    const hotelId = await resolveHotelId(rawUrl, site, session);
+    if (!hotelId) {
+        log.error(`Could not extract hotel ID from ${rawUrl}`);
+        return;
+    }
+    log.info(`Hotel ${hotelId} (${site}) - fetching reviews`);
+
+    let startIndex = 0;
+    while (
+        !stop &&
+        startIndex < scrapeSettings.maxReviewsPerHotel &&
+        scrapeSettings.state.pushedResults < scrapeSettings.maxResults
+    ) {
+        const body = JSON.stringify(buildReviewsBody(hotelId, site, startIndex, scrapeSettings));
+        const res = await fetchUrl(`https://${site}/graphql`, {
+            method: "POST",
+            headers: MOBILE_HEADERS,
+            body,
+            session,
+            country: "US",
         });
-    } else {
-        const match = url.pathname.match(config.urlRegex);
-        if (!match) {
-            log.error(`Could not extract hotel ID from URL: ${request.url}`);
-            continue;
+        if (res.status !== 200) {
+            log.warning(`graphql ${res.status} for hotel ${hotelId} @${startIndex}: ${res.content.slice(0, 160)}`);
+            break;
         }
-        processedRequests.push(
-            ...getNextPagesRequests(
-                match[1],
-                null,
-                scrapeSettings,
-                request.userData,
-                site
-            )
-        );
+        let parsed: unknown;
+        try {
+            parsed = JSON.parse(res.content);
+        } catch {
+            log.error(`graphql non-JSON for hotel ${hotelId} @${startIndex}`);
+            break;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const allReviews: any[] = (parsed as any)?.[0]?.data?.propertyInfo?.reviewInfo?.reviews ?? [];
+        if (allReviews.length === 0) {
+            log.info(`No more reviews for hotel ${hotelId} at index ${startIndex}`);
+            break;
+        }
+
+        const remainingPaid = scrapeSettings.maxResults - scrapeSettings.state.pushedResults;
+        let hitOldReview = false;
+        const dateFiltered = allReviews.filter((x, i) => {
+            const value = x.submissionTime?.longDateFormat;
+            const d = new Date(`${value} UTC`);
+            if (Number.isNaN(d.getTime())) {
+                log.warning(`Failed to parse date hotelId=${hotelId};position=${startIndex + i + 1} \`${value}\``);
+                return true;
+            }
+            const keep = d.getTime() >= scrapeSettings.minDate.getTime();
+            if (!keep) hitOldReview = true;
+            return keep;
+        });
+
+        const reviews = dateFiltered
+            .slice(0, (scrapeSettings.maxReviewsPerHotel ?? Infinity) - startIndex)
+            .slice(0, remainingPaid);
+
+        if (reviews.length > 0) {
+            const { chargeLimitReached } = await pushReviews(
+                reviews.map((review, i) =>
+                    normalizeReview(review, site, hotelId, customData, startIndex + i + 1) as unknown as Record<string, unknown>,
+                ),
+            );
+            scrapeSettings.state.pushedResults += reviews.length;
+            log.info(`Extracted reviews ${startIndex + 1}-${startIndex + reviews.length} for hotel ${hotelId}`);
+            if (chargeLimitReached) {
+                stop = true;
+                await Actor.setStatusMessage("Finishing scraping because we reached Maximum number of paid results");
+                break;
+            }
+        }
+
+        // Reviews are newest-first; once we cross minDate or get a short page, stop.
+        if (hitOldReview || allReviews.length < PAGE_SIZE) break;
+        startIndex += PAGE_SIZE;
     }
 }
 
-router.use((ctx) => {
-    ctx.scrapeSettings = scrapeSettings;
-});
+// Bounded concurrency over the input hotels.
+const sources = (input.startUrls ?? [])
+    .map((s) => (typeof s === "string" ? { url: s, userData: {} } : { url: s.url, userData: s.userData ?? {} }))
+    .filter((s) => s?.url);
 
-const crawler = new CheerioCrawler({
-    maxConcurrency: 40,
-    navigationTimeoutSecs: 20,
-    sessionPoolOptions: {
-        maxPoolSize: 20,
-        sessionOptions: {
-            maxUsageCount: 10,
-        },
-    },
-    proxyConfiguration: await Actor.createProxyConfiguration({
-        groups: ["SHADER", "BUYPROXIES94952"],
-    }),
-    preNavigationHooks: [
-        async (_, gotOptions) => {
-            gotOptions.headerGeneratorOptions = {
-                devices: ['desktop'],
-                locale: ['en-US']
-            };
-        },
-    ],
-    maxRequestRetries: 100,
-    requestHandler: router as any,
-});
-
-// Turn off retry warnings for all 400 status codes because they are off putting to users 
-const originalWarningLog = crawler.log.warning.bind(crawler.log);
-crawler.log.warning = (message: string, data?: Record<string, unknown> | null) => {
-    if (message.includes('Reclaiming failed request') && message.includes('received 4')) {
-        return;
+const CONCURRENCY = 3;
+let cursor = 0;
+async function worker() {
+    while (cursor < sources.length && !stop) {
+        const s = sources[cursor++];
+        try {
+            await scrapeHotel(s.url, s.userData as Record<string, unknown>);
+        } catch (err) {
+            log.error(`Failed ${s.url}: ${(err as Error).message}`);
+        }
     }
-    originalWarningLog(message, data);
-};
-
-await crawler.run(processedRequests);
+}
+await Promise.all(Array.from({ length: Math.min(CONCURRENCY, sources.length) }, worker));
 
 await Actor.exit();

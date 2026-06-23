@@ -4,28 +4,15 @@ import { readFile } from "fs/promises";
 export const EXPEDIA_HOSTNAME = "www.expedia.com";
 export const HOTELS_COM_HOSTNAME = "www.hotels.com";
 export const VRBO_COM_HOSTNAME = "www.vrbo.com";
+
 export const SITES_CONFIG: Record<
     string,
     { urlRegex: RegExp | null; siteId: number }
 > = {
-    [EXPEDIA_HOSTNAME]: {
-        urlRegex: /\.h(\d+)\./,
-        siteId: 1,
-    },
-    [HOTELS_COM_HOSTNAME]: {
-        urlRegex: null,
-        siteId: 300000001,
-    },
-    [VRBO_COM_HOSTNAME]: {
-        urlRegex: null, // Regex to extract the property ID from a long URL
-        siteId: 9001001, // Site ID used in the GraphQL request
-    }
+    [EXPEDIA_HOSTNAME]: { urlRegex: /\.h(\d+)\./, siteId: 1 },
+    [HOTELS_COM_HOSTNAME]: { urlRegex: null, siteId: 300000001 },
+    [VRBO_COM_HOSTNAME]: { urlRegex: /\/(\d+)/, siteId: 9001001 },
 };
-
-export enum LABEL {
-    GET_HOTEL_ID = "GET_HOTEL_ID",
-    REVIEWS_PAGE = "REVIEWS_PAGE",
-}
 
 export enum SortBy {
     MostRelevant = "Most relevant",
@@ -34,7 +21,7 @@ export enum SortBy {
     LowestGuestRating = "Lowest guest rating",
 }
 
-const sortByToRequestParamMap: Record<SortBy, string> = {
+export const sortByToRequestParamMap: Record<SortBy, string> = {
     [SortBy.MostRelevant]: "NEWEST_TO_OLDEST_BY_LANGUAGE",
     [SortBy.MostRecent]: "NEWEST_TO_OLDEST",
     [SortBy.HighestGuestRating]: "HIGHEST_TO_LOWEST_RATED",
@@ -42,7 +29,7 @@ const sortByToRequestParamMap: Record<SortBy, string> = {
 };
 
 export const PAGE_SIZE = 100;
-const QUERY = await readFile("src/reviewsQuery.graphql", "utf-8");
+export const QUERY = await readFile("src/reviewsQuery.graphql", "utf-8");
 
 export type ScrapeSettings = {
     sortBy: SortBy;
@@ -52,125 +39,77 @@ export type ScrapeSettings = {
     state: { pushedResults: number };
 };
 
-export type UserData = {
-    hotelId: string;
-    startIndex: number;
-    customData: any;
-    site: string;
-    label: LABEL;
-};
-
-const getReviewsPageRequest = (
+// The GraphQL operation body for one page of property reviews. Built in Node
+// and handed to page.evaluate(), which issues it as an in-page fetch so the
+// request rides the loaded page's browser realm (Expedia's gateway rejects the
+// same request when replayed outside a real browser context).
+export const buildReviewsBody = (
     hotelId: string,
-    scrapeSettings: ScrapeSettings,
+    site: string,
     startIndex: number,
-    customData: any,
-    site: string
-): {
-    url: string;
-    method: "POST";
-    uniqueKey: string;
-    payload: string;
-    headers: Record<string, string>;
-    userData: UserData;
-} => ({
-    url: `https://${site}/graphql`,
-    method: "POST",
-    uniqueKey: `reviews-${hotelId}?start=${startIndex}`,
-    headers: {
-        "content-type": "application/json",
-        "client-info": "blossom-flex-ui",
-    },
-    userData: {
-        hotelId,
-        startIndex,
-        customData,
-        label: LABEL.REVIEWS_PAGE,
-        site,
-    },
-    payload: JSON.stringify([
-        {
-            operationName: "PropertyFilteredReviewsQuery",
-            variables: {
-                context: {
-                    siteId: SITES_CONFIG[site].siteId,
-                    locale: "en_US",
-                    eapid: 1,
-                    currency: "USD",
-                    device: { type: "DESKTOP" },
-                    identity: {
-                        duaid: randomUUID(),
-                        authState: "ANONYMOUS",
-                    },
-                    privacyTrackingState: "CAN_NOT_TRACK",
-                    debugContext: {
-                        abacusOverrides: [],
-                    },
-                    // tpid: 3001 - hotels firefox+chrome / tpid: 1, - expedia firefox / tpid: 4400 - expedia chrome
+    scrapeSettings: ScrapeSettings,
+) => [
+    {
+        operationName: "PropertyFilteredReviewsQuery",
+        variables: {
+            context: {
+                siteId: SITES_CONFIG[site].siteId,
+                locale: "en_US",
+                eapid: 1,
+                currency: "USD",
+                device: { type: "APP_PHONE" },
+                identity: { duaid: randomUUID(), authState: "ANONYMOUS" },
+                privacyTrackingState: "CAN_NOT_TRACK",
+                debugContext: { abacusOverrides: [] },
+                clientInfo: { name: "android.com.expedia.bookings", version: "2026.25.0" },
+            },
+            propertyId: hotelId,
+            searchCriteria: {
+                primary: {
+                    dateRange: null,
+                    rooms: [],
+                    destination: { regionId: null },
                 },
-                propertyId: hotelId,
-                searchCriteria: {
-                    primary: {
-                        dateRange: null,
-                        rooms: [],
-                        destination: { regionId: null },
-                    },
-                    secondary: {
-                        booleans: [
-                            {
-                                id: "includeRecentReviews",
-                                value: true,
-                            },
-                            {
-                                id: "includeRatingsOnlyReviews",
-                                value: true,
-                            },
-                            {
-                                id: "overrideEmbargoForIndividualReviews",
-                                value: true,
-                            },
-                        ],
-                        counts: [
-                            { id: "startIndex", value: startIndex },
-                            { id: "size", value: PAGE_SIZE },
-                        ],
-                        selections: [
-                            {
-                                id: "sortBy",
-                                value: sortByToRequestParamMap[
-                                    scrapeSettings.sortBy
-                                ],
-                            },
-                        ],
-                    },
+                secondary: {
+                    booleans: [
+                        { id: "includeRecentReviews", value: true },
+                        { id: "includeRatingsOnlyReviews", value: true },
+                        { id: "overrideEmbargoForIndividualReviews", value: true },
+                    ],
+                    counts: [
+                        { id: "startIndex", value: startIndex },
+                        { id: "size", value: PAGE_SIZE },
+                    ],
+                    selections: [
+                        {
+                            id: "sortBy",
+                            value: sortByToRequestParamMap[scrapeSettings.sortBy],
+                        },
+                    ],
                 },
             },
-            query: QUERY,
         },
-    ]),
-});
+        query: QUERY,
+    },
+];
 
-export const getNextPagesRequests = (
-    hotelId: string,
-    currentIndex: number | null,
-    scrapeSettings: ScrapeSettings,
-    customData: any,
-    site: string
-) =>
-    new Array(5)
-        .fill(undefined)
-        .map((_, i) => (currentIndex ?? -PAGE_SIZE) + PAGE_SIZE * (i + 1))
-        .filter(
-            (startIndex) =>
-                startIndex < scrapeSettings.maxReviewsPerHotel &&
-                startIndex < scrapeSettings.maxResults
-        )
-        .map((startIndex) =>
-            getReviewsPageRequest(
-                hotelId,
-                scrapeSettings,
-                startIndex,
-                customData,
-                site
-            )
-        );
+// Resolve the property/hotel id for a source URL. Expedia and VRBO carry it in
+// the path; Hotels.com needs it pulled from the loaded page HTML.
+export const hotelIdFromUrl = (url: URL, site: string): string | null => {
+    const regex = SITES_CONFIG[site]?.urlRegex;
+    if (!regex) return null;
+    const match = url.pathname.match(regex);
+    return match ? match[1] : null;
+};
+
+export const hotelIdFromHtml = (html: string): string | null => {
+    const match = html.match(/"propertyId\\?":\\?"(\d+)\\?"/) ?? html.match(/propertyId["\\:\s]+(\d{4,})/);
+    return match ? match[1] : null;
+};
+
+export const resolveSite = (hostname: string): string => {
+    if (hostname.endsWith("hotels.com") || hostname.endsWith("hoteis.com")) return HOTELS_COM_HOSTNAME;
+    if (hostname.includes("expedia")) return EXPEDIA_HOSTNAME;
+    if (hostname.includes("vrbo")) return VRBO_COM_HOSTNAME;
+    return hostname;
+};

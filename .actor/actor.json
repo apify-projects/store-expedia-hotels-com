@@ -2,6 +2,5 @@
     "actorSpecification": 1,
     "name": "store-expedia-reviews-scraper",
     "version": "0.0",
-    "buildTag": "latest",
-    "environmentVariables": {}
+    "buildTag": "latest"
 }
