@@ -7,8 +7,9 @@ RUN npm run build
 
 FROM apify/actor-node:22
 COPY package*.json ./
+# Keep optional deps: impit ships its native binary as a platform-specific optional dep.
 RUN npm --quiet set progress=false \
-    && npm install --omit=dev --omit=optional \
+    && npm install --omit=dev \
     && echo "Node.js version:" \
     && node --version \
     && rm -r ~/.npm

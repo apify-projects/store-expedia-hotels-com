@@ -10,7 +10,8 @@ import {
     SortBy,
 } from "./utils.js";
 import { chargeEvent, PPE_EVENTS, pushReviews } from "./pricing.js";
-import { ghostFetch, MOBILE_HEADERS } from "./ghost-fetch-client.js";
+import { directFetch, ghostFetch, GhostFetchOptions, GhostFetchResponse, initDirect, MOBILE_HEADERS } from "./ghost-fetch-client.js";
+import { normalizeReview } from "./normalize.js";
 
 await Actor.init();
 await chargeEvent({ eventName: PPE_EVENTS.START, skipIfAlreadyCharged: true });
@@ -21,7 +22,30 @@ const input = (await Actor.getInput<{
     sortBy: SortBy;
     minDate: string;
     debugLog: boolean;
+    transport?: "ghost-fetch" | "direct";
+    proxyGroups?: string[];
+    proxyCountry?: string;
 }>())!;
+
+// Transport selection. Default: ghost-fetch (residential, proven). Set
+// transport=direct + proxyGroups (e.g. ["DATACENTER"]) to test cheaper pools
+// via in-actor impit through the Apify proxy.
+let fetchUrl: (url: string, opts?: GhostFetchOptions) => Promise<GhostFetchResponse> = ghostFetch;
+if (input.transport === "direct") {
+    // Apify datacenter is the default pool (no group). Pass proxyGroups only for
+    // RESIDENTIAL etc. Empty/["DATACENTER"] => datacenter.
+    const groups = (input.proxyGroups ?? []).filter((g) => g && g.toUpperCase() !== "DATACENTER");
+    const proxyConfiguration = await Actor.createProxyConfiguration({
+        ...(groups.length ? { groups } : {}),
+        ...(input.proxyCountry ? { countryCode: input.proxyCountry } : {}),
+    });
+    const proxyUrl = await proxyConfiguration?.newUrl("expediamobile");
+    initDirect(proxyUrl);
+    fetchUrl = directFetch;
+    log.info(`Transport: direct impit via Apify proxy groups=${groups.length ? groups.join(",") : "DATACENTER(default)"}`);
+} else {
+    log.info(`Transport: ghost-fetch (residential)`);
+}
 
 let minDate = new Date(input.minDate || "1990-01-01");
 const DEFAULT_DATE = new Date("1990-01-01");
@@ -48,7 +72,7 @@ async function resolveHotelId(rawUrl: string, site: string, session: string): Pr
     const url = new URL(rawUrl);
     const fromUrl = hotelIdFromUrl(url, site);
     if (fromUrl) return fromUrl;
-    const res = await ghostFetch(rawUrl, { headers: MOBILE_HEADERS, session, country: "US" });
+    const res = await fetchUrl(rawUrl, { headers: MOBILE_HEADERS, session, country: "US" });
     return hotelIdFromHtml(res.content);
 }
 
@@ -81,7 +105,7 @@ async function scrapeHotel(rawUrl: string, customData: Record<string, unknown>) 
         scrapeSettings.state.pushedResults < scrapeSettings.maxResults
     ) {
         const body = JSON.stringify(buildReviewsBody(hotelId, site, startIndex, scrapeSettings));
-        const res = await ghostFetch(`https://${site}/graphql`, {
+        const res = await fetchUrl(`https://${site}/graphql`, {
             method: "POST",
             headers: MOBILE_HEADERS,
             body,
@@ -126,12 +150,9 @@ async function scrapeHotel(rawUrl: string, customData: Record<string, unknown>) 
 
         if (reviews.length > 0) {
             const { chargeLimitReached } = await pushReviews(
-                reviews.map((review, i) => ({
-                    ...review,
-                    hotelId,
-                    reviewPosition: startIndex + i + 1,
-                    customData,
-                })),
+                reviews.map((review, i) =>
+                    normalizeReview(review, site, hotelId, customData, startIndex + i + 1) as unknown as Record<string, unknown>,
+                ),
             );
             scrapeSettings.state.pushedResults += reviews.length;
             log.info(`Extracted reviews ${startIndex + 1}-${startIndex + reviews.length} for hotel ${hotelId}`);

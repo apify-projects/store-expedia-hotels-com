@@ -33,6 +33,27 @@ export interface GhostFetchResponse {
     error?: string;
 }
 
+// Direct transport: TLS-impersonating HTTP client (impit) through an Apify
+// proxy URL (e.g. datacenter). Tests whether the mobile graphql bucket is
+// IP-agnostic - if so, datacenter works and is ~10x cheaper than residential.
+import { Impit } from "impit";
+
+let _impit: Impit | null = null;
+export function initDirect(proxyUrl?: string): void {
+    _impit = new Impit({ browser: "chrome", ...(proxyUrl ? { proxyUrl } : {}), timeout: 60000 });
+}
+
+export async function directFetch(url: string, opts: GhostFetchOptions = {}): Promise<GhostFetchResponse> {
+    if (!_impit) initDirect();
+    const res = await _impit!.fetch(url, {
+        method: opts.method ?? "GET",
+        headers: opts.headers,
+        body: opts.body,
+    });
+    const content = await res.text();
+    return { content, status: res.status, blocked: res.status === 403 || res.status === 429, headers: {} };
+}
+
 export async function ghostFetch(url: string, opts: GhostFetchOptions = {}): Promise<GhostFetchResponse> {
     const token = process.env.GHOST_FETCH_TOKEN ?? process.env.APIFY_TOKEN;
     const res = await fetch(`${GHOST_FETCH_URL}/fetch_url`, {
