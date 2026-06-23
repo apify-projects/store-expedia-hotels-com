@@ -1,21 +1,18 @@
 import { Actor, log } from "apify";
 import {
-    EXPEDIA_HOSTNAME,
-    getNextPagesRequests,
-    HOTELS_COM_HOSTNAME,
-    LABEL,
-    QueueRequest,
+    buildReviewsBody,
+    hotelIdFromHtml,
+    hotelIdFromUrl,
+    PAGE_SIZE,
+    resolveSite,
     ScrapeSettings,
     SITES_CONFIG,
     SortBy,
-    VRBO_COM_HOSTNAME,
 } from "./utils.js";
-import { chargeEvent, PPE_EVENTS } from "./pricing.js";
-import { ghostFetch } from "./ghost-fetch-client.js";
-import { handleGetHotelId, handleReviewsPage, isStopped } from "./handler.js";
+import { chargeEvent, PPE_EVENTS, pushReviews } from "./pricing.js";
+import { ghostFetch, MOBILE_HEADERS } from "./ghost-fetch-client.js";
 
 await Actor.init();
-
 await chargeEvent({ eventName: PPE_EVENTS.START, skipIfAlreadyCharged: true });
 
 const input = (await Actor.getInput<{
@@ -28,13 +25,11 @@ const input = (await Actor.getInput<{
 
 let minDate = new Date(input.minDate || "1990-01-01");
 const DEFAULT_DATE = new Date("1990-01-01");
-
 if (input.sortBy !== SortBy.MostRecent && minDate.toJSON() !== DEFAULT_DATE.toJSON()) {
     minDate = DEFAULT_DATE;
     log.error(`minDate is only supported for SortBy.MostRecent`);
     await Actor.setStatusMessage(`minDate is only supported for SortBy.MostRecent, the field will be ignored`);
 }
-
 if (input.debugLog) log.setLevel(log.LEVELS.DEBUG);
 
 const scrapeSettings: ScrapeSettings = {
@@ -45,111 +40,131 @@ const scrapeSettings: ScrapeSettings = {
     state: await Actor.useState("STATE", { pushedResults: 0 }),
 };
 
-// Build initial queue from startUrls.
-const queue: QueueRequest[] = [];
-const seen = new Set<string>();
+let stop = false;
 
-function enqueue(req: QueueRequest): void {
-    const key = req.uniqueKey ?? req.url;
-    if (seen.has(key)) return;
-    seen.add(key);
-    queue.push(req);
+// Resolve the property id. Expedia/VRBO carry it in the URL; Hotels.com needs a
+// page fetch (mobile UA) to read it from the embedded data.
+async function resolveHotelId(rawUrl: string, site: string, session: string): Promise<string | null> {
+    const url = new URL(rawUrl);
+    const fromUrl = hotelIdFromUrl(url, site);
+    if (fromUrl) return fromUrl;
+    const res = await ghostFetch(rawUrl, { headers: MOBILE_HEADERS, session, country: "US" });
+    return hotelIdFromHtml(res.content);
 }
 
-for (const source of (input.startUrls ?? [])) {
-    const rawUrl = typeof source === "string" ? source : source.url;
-    if (!rawUrl) continue;
-
+async function scrapeHotel(rawUrl: string, customData: Record<string, unknown>) {
     let url: URL;
     try {
         url = new URL(rawUrl.trim());
     } catch {
         log.error(`Invalid URL: ${rawUrl}`);
-        continue;
+        return;
     }
-
-    let site = url.hostname;
-    if (site.endsWith("hotels.com") || site.endsWith("hoteis.com")) site = HOTELS_COM_HOSTNAME;
-    if (site.includes("expedia")) site = EXPEDIA_HOSTNAME;
-    if (site.includes("vrbo")) site = VRBO_COM_HOSTNAME;
-
-    const config = SITES_CONFIG[site];
-    if (config === undefined) {
-        log.error(`Unknown site: ${site}`);
-        continue;
+    const site = resolveSite(url.hostname);
+    if (!SITES_CONFIG[site]) {
+        log.error(`Unknown site: ${site} (${rawUrl})`);
+        return;
     }
+    const session = `exp${site.replace(/[^a-z0-9]/gi, "")}${(url.pathname.match(/\d+/g)?.join("") ?? "").slice(-12)}`;
 
-    const customData = typeof source === "string" ? {} : (source.userData ?? {});
-
-    if (config.urlRegex === null) {
-        enqueue({ url: rawUrl, userData: { site, label: LABEL.GET_HOTEL_ID, customData } });
-    } else {
-        const match = url.pathname.match(config.urlRegex);
-        if (!match) {
-            log.error(`Could not extract hotel ID from URL: ${rawUrl}`);
-            continue;
-        }
-        for (const req of getNextPagesRequests(match[1], null, scrapeSettings, customData, site)) {
-            enqueue(req);
-        }
+    const hotelId = await resolveHotelId(rawUrl, site, session);
+    if (!hotelId) {
+        log.error(`Could not extract hotel ID from ${rawUrl}`);
+        return;
     }
-}
+    log.info(`Hotel ${hotelId} (${site}) - fetching reviews`);
 
-const CONCURRENCY = 10;
-const MAX_RETRIES = 3;
-
-async function processRequest(req: QueueRequest): Promise<void> {
-    if (isStopped()) return;
-
-    let gfRes;
-    try {
-        gfRes = await ghostFetch(req.url, {
-            method: req.method ?? "GET",
-            headers: req.headers,
-            body: req.body,
+    let startIndex = 0;
+    while (
+        !stop &&
+        startIndex < scrapeSettings.maxReviewsPerHotel &&
+        scrapeSettings.state.pushedResults < scrapeSettings.maxResults
+    ) {
+        const body = JSON.stringify(buildReviewsBody(hotelId, site, startIndex, scrapeSettings));
+        const res = await ghostFetch(`https://${site}/graphql`, {
+            method: "POST",
+            headers: MOBILE_HEADERS,
+            body,
+            session,
             country: "US",
-            session: req.userData.hotelId
-                ? `expedia-${req.userData.site}-${req.userData.hotelId}`
-                : `expedia-${req.userData.site}-init`,
         });
-    } catch (err) {
-        const retries = req.retries ?? 0;
-        if (retries < MAX_RETRIES) {
-            queue.push({ ...req, retries: retries + 1 });
-        } else {
-            log.error(`ghost-fetch error after ${MAX_RETRIES} retries: ${req.url}: ${err}`);
+        if (res.status !== 200) {
+            log.warning(`graphql ${res.status} for hotel ${hotelId} @${startIndex}: ${res.content.slice(0, 160)}`);
+            break;
         }
-        return;
-    }
-
-    if (gfRes.blocked || gfRes.status >= 400) {
-        const retries = req.retries ?? 0;
-        if (retries < MAX_RETRIES) {
-            log.warning(`Retrying (${retries + 1}/${MAX_RETRIES}) ${req.url} status=${gfRes.status} blocked=${gfRes.blocked}`);
-            queue.push({ ...req, retries: retries + 1 });
-        } else {
-            log.error(`Failed after ${MAX_RETRIES} retries: ${req.url} status=${gfRes.status}`);
+        let parsed: unknown;
+        try {
+            parsed = JSON.parse(res.content);
+        } catch {
+            log.error(`graphql non-JSON for hotel ${hotelId} @${startIndex}`);
+            break;
         }
-        return;
-    }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const allReviews: any[] = (parsed as any)?.[0]?.data?.propertyInfo?.reviewInfo?.reviews ?? [];
+        if (allReviews.length === 0) {
+            log.info(`No more reviews for hotel ${hotelId} at index ${startIndex}`);
+            break;
+        }
 
-    try {
-        const newRequests = req.userData.label === LABEL.GET_HOTEL_ID
-            ? await handleGetHotelId(req, gfRes.content, scrapeSettings)
-            : await handleReviewsPage(req, gfRes.content, scrapeSettings);
+        const remainingPaid = scrapeSettings.maxResults - scrapeSettings.state.pushedResults;
+        let hitOldReview = false;
+        const dateFiltered = allReviews.filter((x, i) => {
+            const value = x.submissionTime?.longDateFormat;
+            const d = new Date(`${value} UTC`);
+            if (Number.isNaN(d.getTime())) {
+                log.warning(`Failed to parse date hotelId=${hotelId};position=${startIndex + i + 1} \`${value}\``);
+                return true;
+            }
+            const keep = d.getTime() >= scrapeSettings.minDate.getTime();
+            if (!keep) hitOldReview = true;
+            return keep;
+        });
 
-        for (const newReq of newRequests) enqueue(newReq);
-    } catch (err) {
-        log.error(`Handler error for ${req.url}: ${err}`);
+        const reviews = dateFiltered
+            .slice(0, (scrapeSettings.maxReviewsPerHotel ?? Infinity) - startIndex)
+            .slice(0, remainingPaid);
+
+        if (reviews.length > 0) {
+            const { chargeLimitReached } = await pushReviews(
+                reviews.map((review, i) => ({
+                    ...review,
+                    hotelId,
+                    reviewPosition: startIndex + i + 1,
+                    customData,
+                })),
+            );
+            scrapeSettings.state.pushedResults += reviews.length;
+            log.info(`Extracted reviews ${startIndex + 1}-${startIndex + reviews.length} for hotel ${hotelId}`);
+            if (chargeLimitReached) {
+                stop = true;
+                await Actor.setStatusMessage("Finishing scraping because we reached Maximum number of paid results");
+                break;
+            }
+        }
+
+        // Reviews are newest-first; once we cross minDate or get a short page, stop.
+        if (hitOldReview || allReviews.length < PAGE_SIZE) break;
+        startIndex += PAGE_SIZE;
     }
 }
 
-// Process queue in rounds of CONCURRENCY until drained or shouldStop.
-while (queue.length > 0) {
-    if (isStopped()) break;
+// Bounded concurrency over the input hotels.
+const sources = (input.startUrls ?? [])
+    .map((s) => (typeof s === "string" ? { url: s, userData: {} } : { url: s.url, userData: s.userData ?? {} }))
+    .filter((s) => s?.url);
 
-    const batch = queue.splice(0, CONCURRENCY);
-    await Promise.all(batch.map(processRequest));
+const CONCURRENCY = 3;
+let cursor = 0;
+async function worker() {
+    while (cursor < sources.length && !stop) {
+        const s = sources[cursor++];
+        try {
+            await scrapeHotel(s.url, s.userData as Record<string, unknown>);
+        } catch (err) {
+            log.error(`Failed ${s.url}: ${(err as Error).message}`);
+        }
+    }
 }
+await Promise.all(Array.from({ length: Math.min(CONCURRENCY, sources.length) }, worker));
 
 await Actor.exit();
