@@ -20,7 +20,9 @@ export interface GhostFetchResponse {
 }
 
 export async function ghostFetch(url: string, opts: GhostFetchOptions = {}): Promise<GhostFetchResponse> {
-    const token = process.env.APIFY_TOKEN;
+    // Prefer GHOST_FETCH_TOKEN (set in Actor env vars) over the run's APIFY_TOKEN,
+    // because the run token may not have permission to call another org's standby.
+    const token = process.env.GHOST_FETCH_TOKEN ?? process.env.APIFY_TOKEN;
     const res = await fetch(`${GHOST_FETCH_URL}/fetch_url`, {
         method: 'POST',
         headers: {
