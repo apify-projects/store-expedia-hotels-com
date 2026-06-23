@@ -1,4 +1,3 @@
-import { Dictionary } from "@crawlee/cheerio";
 import { Actor } from "apify";
 
 export const PPE_EVENTS = {
@@ -46,7 +45,7 @@ export const chargeEvent = async (
 };
 
 export const pushReviews = async (
-    reviews: Dictionary[]
+    reviews: Record<string, unknown>[]
 ): Promise<SimpleChargeResult> => {
     if (reviews.length === 0) return { chargeLimitReached: false };
 

@@ -53,11 +53,21 @@ export type ScrapeSettings = {
 };
 
 export type UserData = {
-    hotelId: string;
-    startIndex: number;
-    customData: any;
+    hotelId?: string;
+    startIndex?: number;
+    customData?: any;
     site: string;
     label: LABEL;
+};
+
+export type QueueRequest = {
+    url: string;
+    method?: 'GET' | 'POST';
+    headers?: Record<string, string>;
+    body?: string;
+    uniqueKey?: string;
+    retries?: number;
+    userData: UserData;
 };
 
 const getReviewsPageRequest = (
@@ -66,14 +76,7 @@ const getReviewsPageRequest = (
     startIndex: number,
     customData: any,
     site: string
-): {
-    url: string;
-    method: "POST";
-    uniqueKey: string;
-    payload: string;
-    headers: Record<string, string>;
-    userData: UserData;
-} => ({
+): QueueRequest => ({
     url: `https://${site}/graphql`,
     method: "POST",
     uniqueKey: `reviews-${hotelId}?start=${startIndex}`,
@@ -88,7 +91,7 @@ const getReviewsPageRequest = (
         label: LABEL.REVIEWS_PAGE,
         site,
     },
-    payload: JSON.stringify([
+    body: JSON.stringify([
         {
             operationName: "PropertyFilteredReviewsQuery",
             variables: {
