@@ -94,8 +94,14 @@ export const buildReviewsBody = (
 ];
 
 // Resolve the property/hotel id for a source URL. Expedia and VRBO carry it in
-// the path; Hotels.com needs it pulled from the loaded page HTML.
+// the path; Hotels.com needs it pulled from the loaded page HTML. The id can
+// also ride in a query param — Vrbo search URLs pin the chosen listing as
+// ?selected= (also pinnedPropertyId / propertyId) — so check those first.
 export const hotelIdFromUrl = (url: URL, site: string): string | null => {
+    for (const key of ["selected", "pinnedPropertyId", "propertyId"]) {
+        const v = url.searchParams.get(key);
+        if (v && /^\d{3,}$/.test(v)) return v;
+    }
     const regex = SITES_CONFIG[site]?.urlRegex;
     if (!regex) return null;
     const match = url.pathname.match(regex);
