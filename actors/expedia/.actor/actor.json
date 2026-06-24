@@ -1,0 +1,10 @@
+{
+    "actorSpecification": 1,
+    "name": "expedia-hotels-com-reviews-scraper",
+    "title": "Expedia Reviews Scraper",
+    "version": "0.0",
+    "buildTag": "latest",
+    "readme": "../README.md",
+    "input": "./INPUT_SCHEMA.json",
+    "dockerContextDir": "../../"
+}

@@ -1,0 +1,10 @@
+{
+    "actorSpecification": 1,
+    "name": "hotels-com-reviews-scraper",
+    "title": "Hotels.com Reviews Scraper",
+    "version": "0.0",
+    "buildTag": "latest",
+    "readme": "../README.md",
+    "input": "./INPUT_SCHEMA.json",
+    "dockerContextDir": "../../"
+}

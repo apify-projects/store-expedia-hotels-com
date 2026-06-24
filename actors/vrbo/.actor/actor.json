@@ -1,0 +1,10 @@
+{
+    "actorSpecification": 1,
+    "name": "vrbo-reviews-scraper",
+    "title": "Vrbo Reviews Scraper",
+    "version": "0.0",
+    "buildTag": "latest",
+    "readme": "../README.md",
+    "input": "./INPUT_SCHEMA.json",
+    "dockerContextDir": "../../"
+}
