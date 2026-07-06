@@ -56,7 +56,10 @@ export async function directFetch(url: string, opts: GhostFetchOptions = {}): Pr
 
 export async function ghostFetch(url: string, opts: GhostFetchOptions = {}): Promise<GhostFetchResponse> {
     const token = process.env.GHOST_FETCH_TOKEN ?? process.env.APIFY_TOKEN;
-    const res = await fetch(`${GHOST_FETCH_URL}/fetch_url`, {
+    // ghost-fetch trace-v4 endpoint (/v1/fetch). Caller headers (incl. the Android
+    // app identity in MOBILE_HEADERS) are forwarded to the impit Tier-1 request;
+    // the server returns an UnblockResult whose body/status live under `response`.
+    const res = await fetch(`${GHOST_FETCH_URL}/v1/fetch`, {
         method: "POST",
         headers: {
             "content-type": "application/json",
@@ -64,14 +67,27 @@ export async function ghostFetch(url: string, opts: GhostFetchOptions = {}): Pro
         },
         body: JSON.stringify({
             url,
-            output_format: "html",
             method: opts.method ?? "GET",
-            headers: opts.headers,
-            body: opts.body,
+            ...(opts.headers ? { headers: opts.headers } : {}),
+            ...(opts.body ? { body: opts.body } : {}),
             country: opts.country ?? "US",
-            session: opts.session,
+            ...(opts.session ? { session: opts.session } : {}),
         }),
     });
     if (!res.ok) throw new Error(`ghost-fetch gateway ${res.status}: ${(await res.text()).slice(0, 300)}`);
-    return res.json() as Promise<GhostFetchResponse>;
+    const payload = (await res.json()) as {
+        verdict?: string;
+        usable_content?: boolean;
+        error?: string;
+        response?: { status?: number; headers?: Record<string, string>; body?: string };
+    };
+    const r = payload.response ?? {};
+    return {
+        content: r.body ?? "",
+        status: r.status ?? 0,
+        blocked: payload.usable_content === false,
+        headers: r.headers ?? {},
+        resolved_via: payload.verdict,
+        error: payload.error,
+    };
 }
