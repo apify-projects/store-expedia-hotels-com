@@ -21,15 +21,23 @@ const input = (await Actor.getInput<{
     maxReviewsPerHotel: number;
     sortBy: SortBy;
     minDate: string;
+    debugLog?: boolean;
+    proxyGroups?: string[];
+    proxyCountry?: string;
 }>())!;
 
-// Transport: in-actor impit through Apify RESIDENTIAL proxy. Datacenter is
-// rate-limited by the mobile graphql bucket (429), residential is required.
+if (input.debugLog) log.setLevel(log.LEVELS.DEBUG);
+
+// Transport: in-actor impit through Apify proxy. The mobile graphql bucket
+// throttles datacenter IPs (429), so residential is the default. `proxyGroups`
+// / `proxyCountry` let a developer override for local testing.
+const groups = input.proxyGroups?.length ? input.proxyGroups : ["RESIDENTIAL"];
 const proxyConfiguration = await Actor.createProxyConfiguration({
-    groups: ["RESIDENTIAL"],
-    countryCode: "US",
+    groups,
+    countryCode: input.proxyCountry ?? "US",
 });
 initClient(await proxyConfiguration!.newUrl("expediamobile"));
+log.debug(`Proxy: groups=${groups.join(",")} country=${input.proxyCountry ?? "US"}`);
 
 let minDate = new Date(input.minDate || "1990-01-01");
 const DEFAULT_DATE = new Date("1990-01-01");
