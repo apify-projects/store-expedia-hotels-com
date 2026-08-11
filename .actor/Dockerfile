@@ -1,4 +1,4 @@
-# Plain Node image - the scraper is pure HTTP (mobile API via ghost-fetch), no browser.
+# Plain Node image - the scraper is pure HTTP (mobile API), no browser.
 FROM apify/actor-node:22 AS builder
 COPY package*.json ./
 RUN npm install --include=dev --audit=false

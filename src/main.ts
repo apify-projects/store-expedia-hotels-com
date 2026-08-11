@@ -10,7 +10,7 @@ import {
     SortBy,
 } from "./utils.js";
 import { chargeEvent, PPE_EVENTS, pushReviews } from "./pricing.js";
-import { directFetch, ghostFetch, GhostFetchOptions, GhostFetchResponse, initDirect, MOBILE_HEADERS } from "./ghost-fetch-client.js";
+import { fetchMobile, initClient, MOBILE_HEADERS } from "./http-client.js";
 import { normalizeReview } from "./normalize.js";
 
 await Actor.init();
@@ -21,31 +21,15 @@ const input = (await Actor.getInput<{
     maxReviewsPerHotel: number;
     sortBy: SortBy;
     minDate: string;
-    debugLog: boolean;
-    transport?: "ghost-fetch" | "direct";
-    proxyGroups?: string[];
-    proxyCountry?: string;
 }>())!;
 
-// Transport selection. Default: ghost-fetch (residential, proven). Set
-// transport=direct + proxyGroups (e.g. ["DATACENTER"]) to test cheaper pools
-// via in-actor impit through the Apify proxy.
-let fetchUrl: (url: string, opts?: GhostFetchOptions) => Promise<GhostFetchResponse> = ghostFetch;
-if (input.transport === "direct") {
-    // Apify datacenter is the default pool (no group). Pass proxyGroups only for
-    // RESIDENTIAL etc. Empty/["DATACENTER"] => datacenter.
-    const groups = (input.proxyGroups ?? []).filter((g) => g && g.toUpperCase() !== "DATACENTER");
-    const proxyConfiguration = await Actor.createProxyConfiguration({
-        ...(groups.length ? { groups } : {}),
-        ...(input.proxyCountry ? { countryCode: input.proxyCountry } : {}),
-    });
-    const proxyUrl = await proxyConfiguration?.newUrl("expediamobile");
-    initDirect(proxyUrl);
-    fetchUrl = directFetch;
-    log.info(`Transport: direct impit via Apify proxy groups=${groups.length ? groups.join(",") : "DATACENTER(default)"}`);
-} else {
-    log.info(`Transport: ghost-fetch (residential)`);
-}
+// Transport: in-actor impit through Apify RESIDENTIAL proxy. Datacenter is
+// rate-limited by the mobile graphql bucket (429), residential is required.
+const proxyConfiguration = await Actor.createProxyConfiguration({
+    groups: ["RESIDENTIAL"],
+    countryCode: "US",
+});
+initClient(await proxyConfiguration!.newUrl("expediamobile"));
 
 let minDate = new Date(input.minDate || "1990-01-01");
 const DEFAULT_DATE = new Date("1990-01-01");
@@ -54,7 +38,6 @@ if (input.sortBy !== SortBy.MostRecent && minDate.toJSON() !== DEFAULT_DATE.toJS
     log.error(`minDate is only supported for SortBy.MostRecent`);
     await Actor.setStatusMessage(`minDate is only supported for SortBy.MostRecent, the field will be ignored`);
 }
-if (input.debugLog) log.setLevel(log.LEVELS.DEBUG);
 
 const scrapeSettings: ScrapeSettings = {
     sortBy: input.sortBy,
@@ -68,11 +51,11 @@ let stop = false;
 
 // Resolve the property id. Expedia/VRBO carry it in the URL; Hotels.com needs a
 // page fetch (mobile UA) to read it from the embedded data.
-async function resolveHotelId(rawUrl: string, site: string, session: string): Promise<string | null> {
+async function resolveHotelId(rawUrl: string, site: string): Promise<string | null> {
     const url = new URL(rawUrl);
     const fromUrl = hotelIdFromUrl(url, site);
     if (fromUrl) return fromUrl;
-    const res = await fetchUrl(rawUrl, { headers: MOBILE_HEADERS, session, country: "US" });
+    const res = await fetchMobile(rawUrl, { headers: MOBILE_HEADERS });
     return hotelIdFromHtml(res.content);
 }
 
@@ -89,9 +72,7 @@ async function scrapeHotel(rawUrl: string, customData: Record<string, unknown>) 
         log.error(`Unknown site: ${site} (${rawUrl})`);
         return;
     }
-    const session = `exp${site.replace(/[^a-z0-9]/gi, "")}${(url.pathname.match(/\d+/g)?.join("") ?? "").slice(-12)}`;
-
-    const hotelId = await resolveHotelId(rawUrl, site, session);
+    const hotelId = await resolveHotelId(rawUrl, site);
     if (!hotelId) {
         log.error(`Could not extract hotel ID from ${rawUrl}`);
         return;
@@ -105,12 +86,10 @@ async function scrapeHotel(rawUrl: string, customData: Record<string, unknown>) 
         scrapeSettings.state.pushedResults < scrapeSettings.maxResults
     ) {
         const body = JSON.stringify(buildReviewsBody(hotelId, site, startIndex, scrapeSettings));
-        const res = await fetchUrl(`https://${site}/graphql`, {
+        const res = await fetchMobile(`https://${site}/graphql`, {
             method: "POST",
             headers: MOBILE_HEADERS,
             body,
-            session,
-            country: "US",
         });
         if (res.status !== 200) {
             log.warning(`graphql ${res.status} for hotel ${hotelId} @${startIndex}: ${res.content.slice(0, 160)}`);
