@@ -1,3 +1,9 @@
+// The PropertyFilteredReviewsQuery operation, verbatim from the Expedia Android
+// app client. It is kept complete on purpose: the selection set is what produces
+// the raw review shape this Actor outputs, so trimming a field is a breaking
+// change to the dataset.
+
+export const REVIEWS_QUERY = `
 query PropertyFilteredReviewsQuery(
     $context: ContextInput!
     $propertyId: String!
@@ -573,3 +579,4 @@ fragment PopularMentionsFragment on SortAndFilterViewModel {
     }
     __typename
 }
+`;

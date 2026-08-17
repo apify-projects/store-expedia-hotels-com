@@ -1,5 +1,7 @@
 # configurations
 .idea
+.vscode
+.zed
 
 # crawlee and apify storage folders
 apify_storage
@@ -8,6 +10,10 @@ storage
 
 # installed files
 node_modules
+
+# build output - rebuilt inside the image
+dist
+tsconfig.tsbuildinfo
 
 # git folder
 .git

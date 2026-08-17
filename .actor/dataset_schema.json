@@ -1,0 +1,40 @@
+{
+    "$schema": "https://apify.com/schemas/v1/dataset.ide.json",
+    "actorSpecification": 1,
+    "fields": {},
+    "views": {
+        "overview": {
+            "title": "Reviews",
+            "transformation": {
+                "fields": [
+                    "hotelId",
+                    "reviewPosition",
+                    "title",
+                    "text",
+                    "superlative",
+                    "locale",
+                    "submissionTime",
+                    "reviewScoreWithDescription",
+                    "reviewAuthorAttribution",
+                    "customData"
+                ],
+                "flatten": ["submissionTime", "reviewScoreWithDescription", "reviewAuthorAttribution"]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "hotelId": { "label": "Hotel ID", "format": "text" },
+                    "reviewPosition": { "label": "Position", "format": "number" },
+                    "title": { "label": "Title", "format": "text" },
+                    "text": { "label": "Review", "format": "text" },
+                    "superlative": { "label": "Verdict", "format": "text" },
+                    "locale": { "label": "Locale", "format": "text" },
+                    "submissionTime.longDateFormat": { "label": "Submitted", "format": "text" },
+                    "reviewScoreWithDescription.value": { "label": "Score", "format": "text" },
+                    "reviewAuthorAttribution.text": { "label": "Author", "format": "text" },
+                    "customData": { "label": "Custom data", "format": "object" }
+                }
+            }
+        }
+    }
+}

@@ -1,40 +1,14 @@
 {
+    "$schema": "https://apify.com/schemas/v1/actor.ide.json",
     "actorSpecification": 1,
     "name": "store-expedia-reviews-scraper",
-    "version": "0.0",
+    "title": "Expedia / Hotels.com Reviews Scraper",
+    "description": "Scrape guest reviews from any Expedia, Hotels.com or Vrbo property page.",
+    "version": "0.1",
     "buildTag": "latest",
-    "pricingInfos": [
-        {
-            "pricingModel": "PAY_PER_EVENT",
-            "pricingPerEvent": {
-                "actorChargeEvents": {
-                    "start": {
-                        "eventTitle": "Actor start",
-                        "eventDescription": "Flat fee charged once when an Actor run starts.",
-                        "isOneTimeEvent": true,
-                        "eventTieredPricingUsd": {
-                            "FREE": { "tieredEventPriceUsd": 0.0005 },
-                            "BRONZE": { "tieredEventPriceUsd": 0.0005 },
-                            "SILVER": { "tieredEventPriceUsd": 0.0005 },
-                            "GOLD": { "tieredEventPriceUsd": 0.0005 },
-                            "PLATINUM": { "tieredEventPriceUsd": 0.0005 },
-                            "DIAMOND": { "tieredEventPriceUsd": 0.0005 }
-                        }
-                    },
-                    "result": {
-                        "eventTitle": "Review scraped",
-                        "eventDescription": "Charged for each review returned ($1 per 1,000 reviews).",
-                        "eventTieredPricingUsd": {
-                            "FREE": { "tieredEventPriceUsd": 0.001 },
-                            "BRONZE": { "tieredEventPriceUsd": 0.001 },
-                            "SILVER": { "tieredEventPriceUsd": 0.001 },
-                            "GOLD": { "tieredEventPriceUsd": 0.001 },
-                            "PLATINUM": { "tieredEventPriceUsd": 0.001 },
-                            "DIAMOND": { "tieredEventPriceUsd": 0.001 }
-                        }
-                    }
-                }
-            }
-        }
-    ]
+    "inputSchema": "./input_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    },
+    "dockerfile": "../Dockerfile"
 }

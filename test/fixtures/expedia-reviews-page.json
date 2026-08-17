@@ -1,0 +1,1123 @@
+[
+    {
+        "data": {
+            "propertyReviewSummaries": [
+                {
+                    "accessibilityLabel": "Reviews",
+                    "overallScoreWithDescriptionA11y": {
+                        "__typename": "LodgingEnrichedMessage",
+                        "subText": null,
+                        "subtexts": null,
+                        "value": "7.6/10 Good",
+                        "theme": "STRONG",
+                        "state": null,
+                        "accessibilityLabel": "7.6 out of 10 Good",
+                        "icon": null,
+                        "mark": null,
+                        "egdsMark": null
+                    },
+                    "propertyReviewCountDetails": {
+                        "fullDescription": "236 reviews",
+                        "__typename": "PropertyReviewCountDetails"
+                    },
+                    "reviewDisclaimer": "All reviews shown are from real guest experiences. Only travelers who have booked a stay with us can submit a review. We verify reviews according to our guidelines and publish all reviews, positive or negative.",
+                    "reviewDisclaimerHeading": "",
+                    "strategy": "INTERNAL_REVIEWS",
+                    "reviewDisclaimerValues": [
+                        {
+                            "text": "All reviews shown are from real guest experiences. Only travelers who have booked a stay with us can submit a review. We verify reviews according to our guidelines and publish all reviews, positive or negative.",
+                            "__typename": "EGDSStylizedText"
+                        }
+                    ],
+                    "reviewDisclaimerLabel": "Reviews",
+                    "reviewDisclaimerAnalytics": {
+                        "referrerId": "HOT.HIS.ReviewsOverlay.VerifiedReviews",
+                        "linkName": "Verified reviews definition",
+                        "__typename": "ClientSideAnalytics"
+                    },
+                    "reviewDisclaimerUrl": {
+                        "value": "More information",
+                        "accessibilityLabel": "Opens in a new window",
+                        "link": {
+                            "url": "https://www.expedia.com/lp/b/content-guidelines",
+                            "__typename": "LodgingLink"
+                        },
+                        "__typename": "LodgingLinkMessage"
+                    },
+                    "reviewDisclaimerAccessibilityLabel": null,
+                    "__typename": "PropertyReviewSummary",
+                    "reviewSummaryDetails": [
+                        {
+                            "label": "Cleanliness",
+                            "ratingPercentage": 80,
+                            "formattedRatingOutOfMax": "8.0/10",
+                            "__typename": "ReviewSummaryDetail"
+                        },
+                        {
+                            "label": "Staff & service",
+                            "ratingPercentage": 78,
+                            "formattedRatingOutOfMax": "7.8/10",
+                            "__typename": "ReviewSummaryDetail"
+                        },
+                        {
+                            "label": "Amenities",
+                            "ratingPercentage": 78,
+                            "formattedRatingOutOfMax": "7.8/10",
+                            "__typename": "ReviewSummaryDetail"
+                        },
+                        {
+                            "label": "Property conditions & facilities",
+                            "ratingPercentage": 72,
+                            "formattedRatingOutOfMax": "7.2/10",
+                            "__typename": "ReviewSummaryDetail"
+                        }
+                    ],
+                    "totalCount": {
+                        "raw": 236,
+                        "__typename": "FormattedNumber"
+                    }
+                }
+            ],
+            "propertyInfo": {
+                "id": "10966026",
+                "reviewInfo": {
+                    "summary": {
+                        "paginateAction": {
+                            "text": "More reviews",
+                            "analytics": {
+                                "referrerId": "Reviews.ClickMoreReviews",
+                                "linkName": "More Reviews",
+                                "__typename": "ClientSideAnalytics"
+                            },
+                            "__typename": "LodgingButton"
+                        },
+                        "__typename": "PropertyReviewSummary"
+                    },
+                    "reviews": [
+                        {
+                            "contentDirectFeedbackPromptId": null,
+                            "id": "62cab96cfa183b44983dfc4a",
+                            "superlative": "Good",
+                            "locale": "cs_CZ",
+                            "title": "",
+                            "brandType": null,
+                            "disclaimer": "Verified review",
+                            "reviewScoreWithDescription": {
+                                "label": "8 out of 10 Good",
+                                "value": "8/10 Good",
+                                "__typename": "LodgingEnrichedMessage"
+                            },
+                            "text": "",
+                            "highlightedText": null,
+                            "seeMoreAnalytics": {
+                                "linkName": "See more reviews",
+                                "referrerId": "HOT.HIS.See_more.",
+                                "__typename": "ClientSideAnalytics"
+                            },
+                            "submissionTime": {
+                                "longDateFormat": "Jul 10, 2022",
+                                "__typename": "DateTime"
+                            },
+                            "impressionAnalytics": null,
+                            "themes": [
+                                {
+                                    "icon": {
+                                        "id": "sentiment_4",
+                                        "__typename": "Icon"
+                                    },
+                                    "label": "Liked: Cleanliness, staff & service, property conditions & facilities, room comfort",
+                                    "__typename": "ReviewThemes"
+                                }
+                            ],
+                            "reviewFooter": {
+                                "messages": [
+                                    {
+                                        "seoStructuredData": {
+                                            "itemscope": true,
+                                            "itemprop": "author",
+                                            "itemtype": "https://schema.org/Person",
+                                            "content": "Jana",
+                                            "__typename": "SEOStructuredData"
+                                        },
+                                        "text": {
+                                            "text": "Stayed 1 night in Jul 2022",
+                                            "__typename": "EGDSPlainText"
+                                        },
+                                        "__typename": "PropertyReviewFooterMessage"
+                                    }
+                                ],
+                                "__typename": "PropertyReviewFooterSection"
+                            },
+                            "reviewAnalytics": "{\"metadata\":{\"packer_version\":\"1.0.1\"},\"events\":{\"review.presented\":{\"v1\":{\"event_data\":{\"event\":{\"event_name\":\"review.presented\",\"event_version\":\"1.0.0\",\"event_type\":\"Impression\",\"action_location\":\"reviews_overlay\"},\"additional_context\":{\"user_interface\":{\"component_id\":\"62cab96cfa183b44983dfc4a\",\"component_position\":43,\"component_name\":\"NEWEST_TO_OLDEST.all\"}}}}}}}",
+                            "reviewInteractionSections": [
+                                {
+                                    "primaryDisplayString": "0",
+                                    "accessibilityLabel": "Mark review 43 as helpful. 0 other users found review 43 helpful.",
+                                    "reviewInteractionType": "HELPFUL_REVIEW",
+                                    "feedbackAnalytics": {
+                                        "linkName": "Helpful review",
+                                        "referrerId": "HOT.HIS.ReviewsOverlay.THUMB_UP.UPVOTE",
+                                        "__typename": "ClientSideAnalytics"
+                                    },
+                                    "__typename": "PropertyReviewInteraction"
+                                },
+                                {
+                                    "primaryDisplayString": "See more",
+                                    "accessibilityLabel": "See more from Jana's review",
+                                    "reviewInteractionType": "REVIEW_EXPAND_LABEL",
+                                    "feedbackAnalytics": null,
+                                    "__typename": "PropertyReviewInteraction"
+                                },
+                                {
+                                    "primaryDisplayString": "See less",
+                                    "accessibilityLabel": "See less from Jana's review",
+                                    "reviewInteractionType": "REVIEW_COLLAPSE_LABEL",
+                                    "feedbackAnalytics": null,
+                                    "__typename": "PropertyReviewInteraction"
+                                }
+                            ],
+                            "__typename": "PropertyReview",
+                            "reviewAuthorAttribution": {
+                                "text": "Jana",
+                                "__typename": "LodgingHeader"
+                            },
+                            "photoSection": {
+                                "imageClickAnalytics": {
+                                    "referrerId": "HOT.HIS.reviewsPage.OpenGuestImage",
+                                    "linkName": "Guest image module open",
+                                    "__typename": "ClientSideAnalytics"
+                                },
+                                "exitAnalytics": {
+                                    "referrerId": "HOT.HIS.reviewsPage.CloseGuestImage",
+                                    "linkName": "Guest image module close",
+                                    "__typename": "ClientSideAnalytics"
+                                },
+                                "navClickAnalytics": {
+                                    "referrerId": "HOT.HIS",
+                                    "linkName": "Guest image module interaction",
+                                    "__typename": "ClientSideAnalytics"
+                                },
+                                "intersectionAnalytics": {
+                                    "referrerId": "HOT.HIS.reviewsPage.GuestImage.Impression",
+                                    "linkName": "Traveller sees a guest image",
+                                    "__typename": "ClientSideAnalytics"
+                                },
+                                "__typename": "LodgingGalleryCarousel"
+                            },
+                            "photos": [
+                                {
+                                    "description": "",
+                                    "url": "https://a.travel-assets.com/ugc/hotel-reviews/AE41325663BB18F898A61C0F7F31C7D965D9F3DD1657452989561.jpg?impolicy=resizecrop&rw=204&ra=fit&q=high",
+                                    "__typename": "Image"
+                                },
+                                {
+                                    "description": "",
+                                    "url": "https://a.travel-assets.com/ugc/hotel-reviews/2F178F664F8CA6802035DE980AABD76567AE9D101657452983691.jpg?impolicy=resizecrop&rw=204&ra=fit&q=high",
+                                    "__typename": "Image"
+                                },
+                                {
+                                    "description": "",
+                                    "url": "https://a.travel-assets.com/ugc/hotel-reviews/802E3F6CA09B53BE588CE07B1E3312C13F915F871657452989301.jpg?impolicy=resizecrop&rw=204&ra=fit&q=high",
+                                    "__typename": "Image"
+                                },
+                                {
+                                    "description": "",
+                                    "url": "https://a.travel-assets.com/ugc/hotel-reviews/9B54B6B31A8A6B0AB39CEB381FB958CC2CA26B301657452988520.jpg?impolicy=resizecrop&rw=204&ra=fit&q=high",
+                                    "__typename": "Image"
+                                }
+                            ],
+                            "travelers": [],
+                            "translationInfo": null,
+                            "propertyReviewSource": null,
+                            "reviewRegion": null,
+                            "managementResponses": [
+                                {
+                                    "id": "6b0401bb-91f2-4b97-b0ad-562c39535bb8",
+                                    "header": {
+                                        "text": "Response from Helena on Aug 29, 2022",
+                                        "__typename": "LodgingHeader"
+                                    },
+                                    "response": "Very nice pictures :-)Best regards,Hotel Krystal",
+                                    "__typename": "ManagementResponse"
+                                }
+                            ]
+                        },
+                        {
+                            "contentDirectFeedbackPromptId": null,
+                            "id": "63f2848ddb4e6119d60c3d51",
+                            "superlative": "Good",
+                            "locale": "fr_BE",
+                            "title": "",
+                            "brandType": null,
+                            "disclaimer": "Verified review",
+                            "reviewScoreWithDescription": {
+                                "label": "8 out of 10 Good",
+                                "value": "8/10 Good",
+                                "__typename": "LodgingEnrichedMessage"
+                            },
+                            "text": "Chouette hôtel près de l'aéroport avec un super resto avec des plats typiquement tchecs. Par contre, le wifi était inexistant. ",
+                            "highlightedText": null,
+                            "seeMoreAnalytics": {
+                                "linkName": "See more reviews",
+                                "referrerId": "HOT.HIS.See_more.",
+                                "__typename": "ClientSideAnalytics"
+                            },
+                            "submissionTime": {
+                                "longDateFormat": "Feb 19, 2023",
+                                "__typename": "DateTime"
+                            },
+                            "impressionAnalytics": null,
+                            "themes": [
+                                {
+                                    "icon": {
+                                        "id": "sentiment_4",
+                                        "__typename": "Icon"
+                                    },
+                                    "label": "Liked: Cleanliness, staff & service, amenities, property conditions & facilities",
+                                    "__typename": "ReviewThemes"
+                                }
+                            ],
+                            "reviewFooter": {
+                                "messages": [
+                                    {
+                                        "seoStructuredData": {
+                                            "itemscope": true,
+                                            "itemprop": "author",
+                                            "itemtype": "https://schema.org/Person",
+                                            "content": "Diana",
+                                            "__typename": "SEOStructuredData"
+                                        },
+                                        "text": {
+                                            "text": "Stayed 1 night in Feb 2023",
+                                            "__typename": "EGDSPlainText"
+                                        },
+                                        "__typename": "PropertyReviewFooterMessage"
+                                    }
+                                ],
+                                "__typename": "PropertyReviewFooterSection"
+                            },
+                            "reviewAnalytics": "{\"metadata\":{\"packer_version\":\"1.0.1\"},\"events\":{\"review.presented\":{\"v1\":{\"event_data\":{\"event\":{\"event_name\":\"review.presented\",\"event_version\":\"1.0.0\",\"event_type\":\"Impression\",\"action_location\":\"reviews_overlay\"},\"additional_context\":{\"user_interface\":{\"component_id\":\"63f2848ddb4e6119d60c3d51\",\"component_position\":26,\"component_name\":\"NEWEST_TO_OLDEST.all\"}}}}}}}",
+                            "reviewInteractionSections": [
+                                {
+                                    "primaryDisplayString": "0",
+                                    "accessibilityLabel": "Mark review 26 as helpful. 0 other users found review 26 helpful.",
+                                    "reviewInteractionType": "HELPFUL_REVIEW",
+                                    "feedbackAnalytics": {
+                                        "linkName": "Helpful review",
+                                        "referrerId": "HOT.HIS.ReviewsOverlay.THUMB_UP.UPVOTE",
+                                        "__typename": "ClientSideAnalytics"
+                                    },
+                                    "__typename": "PropertyReviewInteraction"
+                                },
+                                {
+                                    "primaryDisplayString": null,
+                                    "accessibilityLabel": null,
+                                    "reviewInteractionType": "REVIEW_REPORT_FLAG",
+                                    "feedbackAnalytics": null,
+                                    "__typename": "PropertyReviewInteraction"
+                                },
+                                {
+                                    "primaryDisplayString": "See more",
+                                    "accessibilityLabel": "See more from Diana's review",
+                                    "reviewInteractionType": "REVIEW_EXPAND_LABEL",
+                                    "feedbackAnalytics": null,
+                                    "__typename": "PropertyReviewInteraction"
+                                },
+                                {
+                                    "primaryDisplayString": "See less",
+                                    "accessibilityLabel": "See less from Diana's review",
+                                    "reviewInteractionType": "REVIEW_COLLAPSE_LABEL",
+                                    "feedbackAnalytics": null,
+                                    "__typename": "PropertyReviewInteraction"
+                                }
+                            ],
+                            "__typename": "PropertyReview",
+                            "reviewAuthorAttribution": {
+                                "text": "Diana",
+                                "__typename": "LodgingHeader"
+                            },
+                            "photoSection": null,
+                            "photos": [],
+                            "travelers": [],
+                            "translationInfo": {
+                                "loadingTranslationText": "Loading translation...",
+                                "targetLocale": null,
+                                "translatedBy": {
+                                    "description": "Translated by Google",
+                                    "__typename": "Mark"
+                                },
+                                "translationCallToActionLabel": "Translate with Google",
+                                "seeOriginalText": "See original",
+                                "__typename": "PropertyReviewTranslationInfo"
+                            },
+                            "propertyReviewSource": null,
+                            "reviewRegion": null,
+                            "managementResponses": [
+                                {
+                                    "id": "6746c1bc-e980-483f-8fc2-52b27dd8caaa",
+                                    "header": {
+                                        "text": "Response from Helena on Mar 6, 2023",
+                                        "__typename": "LodgingHeader"
+                                    },
+                                    "response": "Dear Diana,Thank you for your feedback!Hotel Krystal",
+                                    "__typename": "ManagementResponse"
+                                }
+                            ]
+                        },
+                        {
+                            "contentDirectFeedbackPromptId": null,
+                            "id": "665ba2dea2c6b30f6f3a4b7a",
+                            "superlative": "Good",
+                            "locale": "de_DE",
+                            "title": "",
+                            "brandType": null,
+                            "disclaimer": "Verified review",
+                            "reviewScoreWithDescription": {
+                                "label": "8 out of 10 Good",
+                                "value": "8/10 Good",
+                                "__typename": "LodgingEnrichedMessage"
+                            },
+                            "text": "My flight was cancelled and I had to look for a hotel with 24hrs reception and good transport possibilies from/to the airport. The surrounding of the hotel and the building itself did not appear very friendly. But there was this really nice staff at the reception. I was also surprised when I opened the door to the room. It was newly renovated, clean and with the comfort you need. Best to say is, that it was 5-10min by taxi to the airport, but also public transport is just a few minutes walk away. There is a bus bringing you to the airport and the tram that brings you to the city center of Prague.",
+                            "highlightedText": null,
+                            "seeMoreAnalytics": {
+                                "linkName": "See more reviews",
+                                "referrerId": "HOT.HIS.See_more.",
+                                "__typename": "ClientSideAnalytics"
+                            },
+                            "submissionTime": {
+                                "longDateFormat": "Jun 1, 2024",
+                                "__typename": "DateTime"
+                            },
+                            "impressionAnalytics": null,
+                            "themes": [
+                                {
+                                    "icon": {
+                                        "id": "sentiment_4",
+                                        "__typename": "Icon"
+                                    },
+                                    "label": "Liked: Cleanliness, staff & service, amenities, property conditions & facilities",
+                                    "__typename": "ReviewThemes"
+                                }
+                            ],
+                            "reviewFooter": {
+                                "messages": [
+                                    {
+                                        "seoStructuredData": {
+                                            "itemscope": true,
+                                            "itemprop": "author",
+                                            "itemtype": "https://schema.org/Person",
+                                            "content": "Claudia",
+                                            "__typename": "SEOStructuredData"
+                                        },
+                                        "text": {
+                                            "text": "Stayed 1 night in May 2024",
+                                            "__typename": "EGDSPlainText"
+                                        },
+                                        "__typename": "PropertyReviewFooterMessage"
+                                    }
+                                ],
+                                "__typename": "PropertyReviewFooterSection"
+                            },
+                            "reviewAnalytics": "{\"metadata\":{\"packer_version\":\"1.0.1\"},\"events\":{\"review.presented\":{\"v1\":{\"event_data\":{\"event\":{\"event_name\":\"review.presented\",\"event_version\":\"1.0.0\",\"event_type\":\"Impression\",\"action_location\":\"reviews_overlay\"},\"additional_context\":{\"user_interface\":{\"component_id\":\"665ba2dea2c6b30f6f3a4b7a\",\"component_position\":4,\"component_name\":\"NEWEST_TO_OLDEST.all\"}}}}}}}",
+                            "reviewInteractionSections": [
+                                {
+                                    "primaryDisplayString": "0",
+                                    "accessibilityLabel": "Mark review 4 as helpful. 0 other users found review 4 helpful.",
+                                    "reviewInteractionType": "HELPFUL_REVIEW",
+                                    "feedbackAnalytics": {
+                                        "linkName": "Helpful review",
+                                        "referrerId": "HOT.HIS.ReviewsOverlay.THUMB_UP.UPVOTE",
+                                        "__typename": "ClientSideAnalytics"
+                                    },
+                                    "__typename": "PropertyReviewInteraction"
+                                },
+                                {
+                                    "primaryDisplayString": null,
+                                    "accessibilityLabel": null,
+                                    "reviewInteractionType": "REVIEW_REPORT_FLAG",
+                                    "feedbackAnalytics": null,
+                                    "__typename": "PropertyReviewInteraction"
+                                },
+                                {
+                                    "primaryDisplayString": "See more",
+                                    "accessibilityLabel": "See more from Claudia's review",
+                                    "reviewInteractionType": "REVIEW_EXPAND_LABEL",
+                                    "feedbackAnalytics": null,
+                                    "__typename": "PropertyReviewInteraction"
+                                },
+                                {
+                                    "primaryDisplayString": "See less",
+                                    "accessibilityLabel": "See less from Claudia's review",
+                                    "reviewInteractionType": "REVIEW_COLLAPSE_LABEL",
+                                    "feedbackAnalytics": null,
+                                    "__typename": "PropertyReviewInteraction"
+                                }
+                            ],
+                            "__typename": "PropertyReview",
+                            "reviewAuthorAttribution": {
+                                "text": "Claudia",
+                                "__typename": "LodgingHeader"
+                            },
+                            "photoSection": null,
+                            "photos": [],
+                            "travelers": [],
+                            "translationInfo": {
+                                "loadingTranslationText": "Loading translation...",
+                                "targetLocale": null,
+                                "translatedBy": {
+                                    "description": "Translated by Google",
+                                    "__typename": "Mark"
+                                },
+                                "translationCallToActionLabel": "Translate with Google",
+                                "seeOriginalText": "See original",
+                                "__typename": "PropertyReviewTranslationInfo"
+                            },
+                            "propertyReviewSource": null,
+                            "reviewRegion": null,
+                            "managementResponses": []
+                        }
+                    ],
+                    "impressionAnalytics": "{\"metadata\":{\"packer_version\":\"1.0.1\"},\"events\":{\"reviews.viewed\":{\"v1\":{\"event_data\":{\"event\":{\"event_name\":\"reviews.viewed\",\"event_version\":\"1.0.0\",\"event_type\":\"Impression\",\"action_reason\":\"Free text unfiltered\"},\"product_list\":[{\"guest_rating_count\":50}]}}}}}",
+                    "noResultsMessage": null,
+                    "__typename": "PropertyReviews",
+                    "sortAndFilter": {
+                        "sortAndFilter": [
+                            {
+                                "name": "travelerType",
+                                "label": "Traveler type",
+                                "clickAnalytics": {
+                                    "linkName": "Traveler type clicked",
+                                    "referrerId": "HOT.HIS.Reviews.Filter.Traveler type.dropDownClicked",
+                                    "__typename": "ClientSideAnalytics"
+                                },
+                                "options": [
+                                    {
+                                        "label": "All",
+                                        "isSelected": true,
+                                        "optionValue": "all",
+                                        "description": null,
+                                        "clickAnalytics": {
+                                            "linkName": "Traveler type selected",
+                                            "referrerId": "HOT.HIS.Reviews.Filter.Traveler type.All.True",
+                                            "__typename": "ClientSideAnalytics"
+                                        },
+                                        "__typename": "OptionViewModel",
+                                        "ariaLabel": null
+                                    },
+                                    {
+                                        "label": "Couples",
+                                        "isSelected": false,
+                                        "optionValue": "couples",
+                                        "description": null,
+                                        "clickAnalytics": {
+                                            "linkName": "Traveler type selected",
+                                            "referrerId": "HOT.HIS.Reviews.Filter.Traveler type.Couples.True",
+                                            "__typename": "ClientSideAnalytics"
+                                        },
+                                        "__typename": "OptionViewModel",
+                                        "ariaLabel": null
+                                    },
+                                    {
+                                        "label": "Solo travelers",
+                                        "isSelected": false,
+                                        "optionValue": "solo_travelers",
+                                        "description": null,
+                                        "clickAnalytics": {
+                                            "linkName": "Traveler type selected",
+                                            "referrerId": "HOT.HIS.Reviews.Filter.Traveler type.Solo_travelers.True",
+                                            "__typename": "ClientSideAnalytics"
+                                        },
+                                        "__typename": "OptionViewModel",
+                                        "ariaLabel": null
+                                    },
+                                    {
+                                        "label": "Business travelers",
+                                        "isSelected": false,
+                                        "optionValue": "business_travelers",
+                                        "description": null,
+                                        "clickAnalytics": {
+                                            "linkName": "Traveler type selected",
+                                            "referrerId": "HOT.HIS.Reviews.Filter.Traveler type.Business_travelers.True",
+                                            "__typename": "ClientSideAnalytics"
+                                        },
+                                        "__typename": "OptionViewModel",
+                                        "ariaLabel": null
+                                    },
+                                    {
+                                        "label": "Families",
+                                        "isSelected": false,
+                                        "optionValue": "families",
+                                        "description": null,
+                                        "clickAnalytics": {
+                                            "linkName": "Traveler type selected",
+                                            "referrerId": "HOT.HIS.Reviews.Filter.Traveler type.Families.True",
+                                            "__typename": "ClientSideAnalytics"
+                                        },
+                                        "__typename": "OptionViewModel",
+                                        "ariaLabel": null
+                                    },
+                                    {
+                                        "label": "Families with small children",
+                                        "isSelected": false,
+                                        "optionValue": "families_with_small_children",
+                                        "description": null,
+                                        "clickAnalytics": {
+                                            "linkName": "Traveler type selected",
+                                            "referrerId": "HOT.HIS.Reviews.Filter.Traveler type.Families_with_small_children.True",
+                                            "__typename": "ClientSideAnalytics"
+                                        },
+                                        "__typename": "OptionViewModel",
+                                        "ariaLabel": null
+                                    },
+                                    {
+                                        "label": "Groups",
+                                        "isSelected": false,
+                                        "optionValue": "groups",
+                                        "description": null,
+                                        "clickAnalytics": {
+                                            "linkName": "Traveler type selected",
+                                            "referrerId": "HOT.HIS.Reviews.Filter.Traveler type.Groups.True",
+                                            "__typename": "ClientSideAnalytics"
+                                        },
+                                        "__typename": "OptionViewModel",
+                                        "ariaLabel": null
+                                    },
+                                    {
+                                        "label": "Travelers with pets",
+                                        "isSelected": false,
+                                        "optionValue": "travelers_with_pets",
+                                        "description": null,
+                                        "clickAnalytics": {
+                                            "linkName": "Traveler type selected",
+                                            "referrerId": "HOT.HIS.Reviews.Filter.Traveler type.Travelers_with_pets.True",
+                                            "__typename": "ClientSideAnalytics"
+                                        },
+                                        "__typename": "OptionViewModel",
+                                        "ariaLabel": null
+                                    }
+                                ],
+                                "__typename": "FilterViewModel",
+                                "graphic": null,
+                                "submittedAnalytics": null,
+                                "initiatedAnalytics": null,
+                                "title": "travelerType",
+                                "placeholder": "",
+                                "showListOptions": null
+                            },
+                            {
+                                "name": "sortBy",
+                                "label": "Sort by",
+                                "clickAnalytics": {
+                                    "linkName": "Sort clicked",
+                                    "referrerId": "HOT.HIS.ReviewsOverlay.SortClicked",
+                                    "__typename": "ClientSideAnalytics"
+                                },
+                                "options": [
+                                    {
+                                        "label": "Highest guest rating",
+                                        "isSelected": false,
+                                        "optionValue": "HIGHEST_TO_LOWEST_RATED",
+                                        "description": null,
+                                        "clickAnalytics": {
+                                            "linkName": "Sort reviews by highest rating",
+                                            "referrerId": "HOT.HIS.ReviewsOverlay.Sort.HighestRating",
+                                            "__typename": "ClientSideAnalytics"
+                                        },
+                                        "__typename": "OptionViewModel",
+                                        "ariaLabel": null
+                                    },
+                                    {
+                                        "label": "Lowest guest rating",
+                                        "isSelected": false,
+                                        "optionValue": "LOWEST_TO_HIGHEST_RATED",
+                                        "description": null,
+                                        "clickAnalytics": {
+                                            "linkName": "Sort reviews by lowest rating",
+                                            "referrerId": "HOT.HIS.ReviewsOverlay.Sort.LowestRating",
+                                            "__typename": "ClientSideAnalytics"
+                                        },
+                                        "__typename": "OptionViewModel",
+                                        "ariaLabel": null
+                                    },
+                                    {
+                                        "label": "Most recent",
+                                        "isSelected": true,
+                                        "optionValue": "NEWEST_TO_OLDEST",
+                                        "description": null,
+                                        "clickAnalytics": {
+                                            "linkName": "Sort reviews by most recent",
+                                            "referrerId": "HOT.HIS.ReviewsOverlay.Sort.MostRecent",
+                                            "__typename": "ClientSideAnalytics"
+                                        },
+                                        "__typename": "OptionViewModel",
+                                        "ariaLabel": null
+                                    },
+                                    {
+                                        "label": "Most relevant",
+                                        "isSelected": false,
+                                        "optionValue": "NEWEST_TO_OLDEST_BY_LANGUAGE",
+                                        "description": null,
+                                        "clickAnalytics": {
+                                            "linkName": "Sort reviews by most relevant",
+                                            "referrerId": "HOT.HIS.ReviewsOverlay.Sort.MostRelevant",
+                                            "__typename": "ClientSideAnalytics"
+                                        },
+                                        "__typename": "OptionViewModel",
+                                        "ariaLabel": null
+                                    }
+                                ],
+                                "__typename": "FilterViewModel",
+                                "graphic": null,
+                                "submittedAnalytics": null,
+                                "initiatedAnalytics": null,
+                                "title": "sortBy",
+                                "placeholder": "",
+                                "showListOptions": null
+                            }
+                        ],
+                        "__typename": "SortAndFilterViewModel"
+                    }
+                },
+                "__typename": "PropertyInfo"
+            }
+        },
+        "extensions": {
+            "trace": {
+                "Trace-ID": "db962c79-0232-4604-a508-cb62d0a71608"
+            },
+            "analytics": [
+                {
+                    "traceId": "db962c79-0232-4604-a508-cb62d0a71608",
+                    "creationTimestamp": 1786975428408,
+                    "context": {
+                        "executeXdid": true,
+                        "tealiumAccountDetailsPWA": {
+                            "tealiumAccountName": "TEALIUM_OFF",
+                            "tealiumProfileName": "TEALIUM_OFF"
+                        },
+                        "beaconOffConfig": {
+                            "settings": {
+                                "adobeSuiteAccount": "expediaglobaluserdev",
+                                "sendToAdobeClientSide": false,
+                                "sendToAdobeServerSide": false,
+                                "sendToS3": false,
+                                "adobeSuiteUrl": "http://expedia.112.2o7.net/b/ss/expediaglobaluserdev/6"
+                            },
+                            "rulesMatched": "ALL_BEACON_OFF",
+                            "bucketing": {
+                                "experimentInstance": "",
+                                "bucketValue": 2,
+                                "experimentId": ""
+                            },
+                            "error": ""
+                        },
+                        "tealiumAccountDetails": {
+                            "tealiumAccountName": "TEALIUM_OFF",
+                            "tealiumProfileName": "TEALIUM_OFF"
+                        },
+                        "entryPageView": false,
+                        "beaconEnabled": true,
+                        "newVisit": false
+                    },
+                    "tealiumUtagData": {
+                        "siteCountryCode": "US",
+                        "tpid": 1,
+                        "pageInfo": {
+                            "requestURL": "http://www.expedia.com/graphql",
+                            "currency": "USD",
+                            "language": "en"
+                        },
+                        "tc_vars": {
+                            "identifiers_session_id": "2d639b1d-e718-3c1f-acba-badd1270eeb3",
+                            "point_of_sale_eg_pos_id": "EXPEDIA_US",
+                            "language": "en",
+                            "search_request_gaia_id": "Unknown",
+                            "point_of_sale_eg_brand_name": "expedia",
+                            "device_information_device_type": "MOBILE",
+                            "identifiers_tpid": 1,
+                            "timestamps_received_at": "2026-08-17T14:03:48.396869175Z",
+                            "identifiers_site_id": 1,
+                            "host": "www.expedia.com",
+                            "point_of_sale": "Unknown",
+                            "is_native_app": true,
+                            "is_EU_POS": false,
+                            "default_domain": "www.expedia.com",
+                            "point_of_sale_site_currency_code": "USD",
+                            "user_agent": "ExpediaBookings/2026.25.0 Dalvik/2.1.0 (Linux; U; Android 12; sdk_gphone64_arm64 Build/S2B2.211203.006)",
+                            "identifiers_device_user_agent_id": "32acc08b-6a5f-4704-a5f9-a0b72d4056f5",
+                            "isNativeOneCKO": false,
+                            "point_of_sale_locale": "US",
+                            "identifiers_event_trace_id": "db962c7902324604a508cb62d0a71608",
+                            "request_request_url": "http://www.expedia.com/graphql",
+                            "environment": "prod",
+                            "line_of_business": "Unknown",
+                            "is_native_app_onecheckout": false,
+                            "domain": "Unknown"
+                        },
+                        "siteName": "www.expedia.com",
+                        "language": "en",
+                        "locale": "en_US",
+                        "Geo": {
+                            "country": "CZ",
+                            "city": "PROSTEJOV",
+                            "latitude": 49.4795,
+                            "state": "713",
+                            "longitude": 17.1148
+                        },
+                        "eapid": 0,
+                        "context": {
+                            "traceId": "db962c7902324604a508cb62d0a71608",
+                            "site": {
+                                "companyCode": "10111",
+                                "tpid": 1,
+                                "eapid": 0,
+                                "brandId": "expedia",
+                                "siteId": 1,
+                                "siteName": "www.expedia.com",
+                                "jurisdictionCode": "USA",
+                                "managementUnitCode": "1010",
+                                "defaultCountry": "US"
+                            },
+                            "requestId": "db962c79-0232-4604-a508-cb62d0a71608",
+                            "hopScotchSessionId": "2d639b1d-e718-3c1f-acba-badd1270eeb3",
+                            "clientInfo": {
+                                "deviceCharacteristics": {
+                                    "brandName": "Chrome",
+                                    "deviceOs": "ANDROID",
+                                    "mobileBrowserVersion": "124",
+                                    "resolutionHeight": 800,
+                                    "mobile": true,
+                                    "deviceOsVersion": "10.15",
+                                    "mobileBrowser": "Chrome",
+                                    "physicalScreenHeight": 175,
+                                    "modelName": "124",
+                                    "tablet": false,
+                                    "resolutionWidth": 1280,
+                                    "wirelessDevice": false,
+                                    "physicalScreenWidth": 280
+                                },
+                                "os": "ANDROID",
+                                "ipAddress": "46.33.112.***",
+                                "userAgent": "ExpediaBookings/2026.25.0 Dalvik/2.1.0 (Linux; U; Android 12; sdk_gphone64_arm64 Build/S2B2.211203.006)",
+                                "ua": "ExpediaBookings/2026.25.0 Dalvik/2.1.0 (Linux; U; Android 12; sdk_gphone64_arm64 Build/S2B2.211203.006)",
+                                "requestMadeByBot": true,
+                                "coords": {
+                                    "country": "CZ",
+                                    "city": "PROSTEJOV",
+                                    "latitude": 49.4795,
+                                    "state": "713",
+                                    "longitude": 17.1148
+                                }
+                            },
+                            "sessionId": "2d639b1d-e718-3c1f-acba-badd1270eeb3",
+                            "user": {
+                                "guid": "32acc08b-6a5f-4704-a5f9-a0b72d4056f5"
+                            }
+                        },
+                        "siteId": 1,
+                        "guid": "32acc08b-6a5f-4704-a5f9-a0b72d4056f5",
+                        "tc_context": {
+                            "tcContainerUrl": "https://cdn.tagcommander.com/6035/tc_bex_prod.js",
+                            "enabled": true
+                        },
+                        "brand": "expedia",
+                        "currencyCode": "USD"
+                    },
+                    "version": "9.1.6",
+                    "applicationName": "experience-api-lodging-reviews"
+                },
+                {
+                    "traceId": "db962c79-0232-4604-a508-cb62d0a71608",
+                    "creationTimestamp": 1786975428413,
+                    "context": {
+                        "executeXdid": true,
+                        "tealiumAccountDetailsPWA": {
+                            "tealiumAccountName": "TEALIUM_OFF",
+                            "tealiumProfileName": "TEALIUM_OFF"
+                        },
+                        "beaconOffConfig": {
+                            "settings": {
+                                "adobeSuiteAccount": "expediaglobaluserdev",
+                                "sendToAdobeClientSide": false,
+                                "sendToAdobeServerSide": false,
+                                "sendToS3": false,
+                                "adobeSuiteUrl": "http://expedia.112.2o7.net/b/ss/expediaglobaluserdev/6"
+                            },
+                            "rulesMatched": "ALL_BEACON_OFF",
+                            "bucketing": {
+                                "experimentInstance": "",
+                                "bucketValue": 2,
+                                "experimentId": ""
+                            },
+                            "error": ""
+                        },
+                        "tealiumAccountDetails": {
+                            "tealiumAccountName": "TEALIUM_OFF",
+                            "tealiumProfileName": "TEALIUM_OFF"
+                        },
+                        "entryPageView": false,
+                        "beaconEnabled": true,
+                        "newVisit": false
+                    },
+                    "tealiumUtagData": {
+                        "siteCountryCode": "US",
+                        "tpid": 1,
+                        "pageInfo": {
+                            "requestURL": "http://www.expedia.com/graphql",
+                            "currency": "USD",
+                            "language": "en"
+                        },
+                        "tc_vars": {
+                            "privacy_gdpr_consent": true,
+                            "identifiers_session_id": "2d639b1d-e718-3c1f-acba-badd1270eeb3",
+                            "point_of_sale_eg_pos_id": "EXPEDIA_US",
+                            "language": "en",
+                            "search_request_gaia_id": "Unknown",
+                            "point_of_sale_eg_brand_name": "expedia",
+                            "device_information_device_type": "MOBILE",
+                            "identifiers_tpid": 1,
+                            "timestamps_received_at": "2026-08-17T14:03:48.399770947Z",
+                            "identifiers_site_id": 1,
+                            "host": "www.expedia.com",
+                            "point_of_sale": "Unknown",
+                            "is_native_app": true,
+                            "is_EU_POS": false,
+                            "default_domain": "www.expedia.com",
+                            "point_of_sale_site_currency_code": "USD",
+                            "user_agent": "ExpediaBookings/2026.25.0 Dalvik/2.1.0 (Linux; U; Android 12; sdk_gphone64_arm64 Build/S2B2.211203.006)",
+                            "privacy_ccpa_consent": true,
+                            "identifiers_device_user_agent_id": "32acc08b-6a5f-4704-a5f9-a0b72d4056f5",
+                            "isNativeOneCKO": false,
+                            "point_of_sale_locale": "US",
+                            "identifiers_event_trace_id": "db962c7902324604a508cb62d0a71608",
+                            "request_request_url": "http://www.expedia.com/graphql",
+                            "environment": "prod",
+                            "line_of_business": "Unknown",
+                            "is_native_app_onecheckout": false,
+                            "domain": "Unknown"
+                        },
+                        "siteName": "www.expedia.com",
+                        "language": "en",
+                        "locale": "en_US",
+                        "Geo": {
+                            "country": "CZ",
+                            "city": "PROSTEJOV",
+                            "latitude": 49.4795,
+                            "state": "713",
+                            "longitude": 17.1148
+                        },
+                        "eapid": 0,
+                        "context": {
+                            "traceId": "db962c7902324604a508cb62d0a71608",
+                            "site": {
+                                "companyCode": "10111",
+                                "tpid": 1,
+                                "eapid": 0,
+                                "brandId": "expedia",
+                                "siteId": 1,
+                                "siteName": "www.expedia.com",
+                                "jurisdictionCode": "USA",
+                                "managementUnitCode": "1010",
+                                "defaultCountry": "US"
+                            },
+                            "privacyContext": {
+                                "canTrack": true,
+                                "canSell": true,
+                                "optInPrivacySelection": {
+                                    "yesSelected": false,
+                                    "isSet": false
+                                },
+                                "dataProtectionGuideline": "GDPR"
+                            },
+                            "requestId": "db962c79-0232-4604-a508-cb62d0a71608",
+                            "hopScotchSessionId": "2d639b1d-e718-3c1f-acba-badd1270eeb3",
+                            "clientInfo": {
+                                "deviceCharacteristics": {
+                                    "brandName": "Chrome",
+                                    "deviceOs": "ANDROID",
+                                    "mobileBrowserVersion": "124",
+                                    "resolutionHeight": 800,
+                                    "mobile": true,
+                                    "deviceOsVersion": "10.15",
+                                    "mobileBrowser": "Chrome",
+                                    "physicalScreenHeight": 175,
+                                    "modelName": "124",
+                                    "tablet": false,
+                                    "resolutionWidth": 1280,
+                                    "wirelessDevice": false,
+                                    "physicalScreenWidth": 280
+                                },
+                                "os": "ANDROID",
+                                "ipAddress": "46.33.112.***",
+                                "userAgent": "ExpediaBookings/2026.25.0 Dalvik/2.1.0 (Linux; U; Android 12; sdk_gphone64_arm64 Build/S2B2.211203.006)",
+                                "ua": "ExpediaBookings/2026.25.0 Dalvik/2.1.0 (Linux; U; Android 12; sdk_gphone64_arm64 Build/S2B2.211203.006)",
+                                "requestMadeByBot": true,
+                                "coords": {
+                                    "country": "CZ",
+                                    "city": "PROSTEJOV",
+                                    "latitude": 49.4795,
+                                    "state": "713",
+                                    "longitude": 17.1148
+                                }
+                            },
+                            "sessionId": "2d639b1d-e718-3c1f-acba-badd1270eeb3",
+                            "user": {
+                                "guid": "32acc08b-6a5f-4704-a5f9-a0b72d4056f5"
+                            }
+                        },
+                        "siteId": 1,
+                        "guid": "32acc08b-6a5f-4704-a5f9-a0b72d4056f5",
+                        "tc_context": {
+                            "tcContainerUrl": "https://cdn.tagcommander.com/6035/tc_bex_prod.js",
+                            "enabled": true
+                        },
+                        "brand": "expedia",
+                        "currencyCode": "USD"
+                    },
+                    "version": "9.1.6",
+                    "applicationName": "experience-api-lodging-property"
+                },
+                {
+                    "traceId": "db962c79-0232-4604-a508-cb62d0a71608",
+                    "creationTimestamp": 1786975428459,
+                    "context": {
+                        "executeXdid": true,
+                        "tealiumAccountDetailsPWA": {
+                            "tealiumAccountName": "TEALIUM_OFF",
+                            "tealiumProfileName": "TEALIUM_OFF"
+                        },
+                        "beaconOffConfig": {
+                            "settings": {
+                                "adobeSuiteAccount": "expediaglobaluserdev",
+                                "sendToAdobeClientSide": false,
+                                "sendToAdobeServerSide": false,
+                                "sendToS3": false,
+                                "adobeSuiteUrl": "http://expedia.112.2o7.net/b/ss/expediaglobaluserdev/6"
+                            },
+                            "rulesMatched": "ALL_BEACON_OFF",
+                            "bucketing": {
+                                "experimentInstance": "",
+                                "bucketValue": 2,
+                                "experimentId": ""
+                            },
+                            "error": ""
+                        },
+                        "tealiumAccountDetails": {
+                            "tealiumAccountName": "TEALIUM_OFF",
+                            "tealiumProfileName": "TEALIUM_OFF"
+                        },
+                        "entryPageView": false,
+                        "beaconEnabled": true,
+                        "newVisit": false
+                    },
+                    "tealiumUtagData": {
+                        "siteCountryCode": "US",
+                        "tpid": 1,
+                        "pageInfo": {
+                            "requestURL": "http://www.expedia.com/graphql",
+                            "currency": "USD",
+                            "language": "en"
+                        },
+                        "tc_vars": {
+                            "identifiers_session_id": "2d639b1d-e718-3c1f-acba-badd1270eeb3",
+                            "point_of_sale_eg_pos_id": "EXPEDIA_US",
+                            "language": "en",
+                            "search_request_gaia_id": "Unknown",
+                            "point_of_sale_eg_brand_name": "expedia",
+                            "device_information_device_type": "MOBILE",
+                            "identifiers_tpid": 1,
+                            "timestamps_received_at": "2026-08-17T14:03:48.422532341Z",
+                            "identifiers_site_id": 1,
+                            "host": "www.expedia.com",
+                            "point_of_sale": "Unknown",
+                            "is_native_app": true,
+                            "is_EU_POS": false,
+                            "default_domain": "www.expedia.com",
+                            "point_of_sale_site_currency_code": "USD",
+                            "user_agent": "ExpediaBookings/2026.25.0 Dalvik/2.1.0 (Linux; U; Android 12; sdk_gphone64_arm64 Build/S2B2.211203.006)",
+                            "identifiers_device_user_agent_id": "32acc08b-6a5f-4704-a5f9-a0b72d4056f5",
+                            "isNativeOneCKO": false,
+                            "point_of_sale_locale": "US",
+                            "identifiers_event_trace_id": "db962c7902324604a508cb62d0a71608",
+                            "request_request_url": "http://www.expedia.com/graphql",
+                            "environment": "prod",
+                            "line_of_business": "Unknown",
+                            "is_native_app_onecheckout": false,
+                            "domain": "Unknown"
+                        },
+                        "siteName": "www.expedia.com",
+                        "language": "en",
+                        "locale": "en_US",
+                        "Geo": {
+                            "country": "CZ",
+                            "city": "PROSTEJOV",
+                            "latitude": 49.4795,
+                            "state": "713",
+                            "longitude": 17.1148
+                        },
+                        "eapid": 0,
+                        "context": {
+                            "traceId": "db962c7902324604a508cb62d0a71608",
+                            "site": {
+                                "companyCode": "10111",
+                                "tpid": 1,
+                                "eapid": 0,
+                                "brandId": "expedia",
+                                "siteId": 1,
+                                "siteName": "www.expedia.com",
+                                "jurisdictionCode": "USA",
+                                "managementUnitCode": "1010",
+                                "defaultCountry": "US"
+                            },
+                            "requestId": "db962c79-0232-4604-a508-cb62d0a71608",
+                            "hopScotchSessionId": "2d639b1d-e718-3c1f-acba-badd1270eeb3",
+                            "clientInfo": {
+                                "deviceCharacteristics": {
+                                    "brandName": "Chrome",
+                                    "deviceOs": "ANDROID",
+                                    "mobileBrowserVersion": "124",
+                                    "resolutionHeight": 800,
+                                    "mobile": true,
+                                    "deviceOsVersion": "10.15",
+                                    "mobileBrowser": "Chrome",
+                                    "physicalScreenHeight": 175,
+                                    "modelName": "124",
+                                    "tablet": false,
+                                    "resolutionWidth": 1280,
+                                    "wirelessDevice": false,
+                                    "physicalScreenWidth": 280
+                                },
+                                "os": "ANDROID",
+                                "ipAddress": "46.33.112.***",
+                                "userAgent": "ExpediaBookings/2026.25.0 Dalvik/2.1.0 (Linux; U; Android 12; sdk_gphone64_arm64 Build/S2B2.211203.006)",
+                                "ua": "ExpediaBookings/2026.25.0 Dalvik/2.1.0 (Linux; U; Android 12; sdk_gphone64_arm64 Build/S2B2.211203.006)",
+                                "requestMadeByBot": true,
+                                "coords": {
+                                    "country": "CZ",
+                                    "city": "PROSTEJOV",
+                                    "latitude": 49.4795,
+                                    "state": "713",
+                                    "longitude": 17.1148
+                                }
+                            },
+                            "sessionId": "2d639b1d-e718-3c1f-acba-badd1270eeb3",
+                            "user": {
+                                "guid": "32acc08b-6a5f-4704-a5f9-a0b72d4056f5"
+                            }
+                        },
+                        "siteId": 1,
+                        "guid": "32acc08b-6a5f-4704-a5f9-a0b72d4056f5",
+                        "tc_context": {
+                            "tcContainerUrl": "https://cdn.tagcommander.com/6035/tc_bex_prod.js",
+                            "enabled": true
+                        },
+                        "brand": "expedia",
+                        "currencyCode": "USD"
+                    },
+                    "version": "9.1.6",
+                    "applicationName": "experience-api-lodging-reviews"
+                }
+            ]
+        }
+    }
+]

@@ -1,10 +1,16 @@
 {
     "extends": "@apify/tsconfig",
     "compilerOptions": {
-        "module": "ES2022",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
         "target": "ES2022",
+        "rootDir": "./src",
         "outDir": "dist",
+        // Off so no tsconfig.tsbuildinfo is written. A stale one makes tsc think the
+        // build is up to date, emit nothing, and the run die on a missing dist/main.js.
+        "incremental": false,
         "noUnusedLocals": false,
+        "skipLibCheck": true,
         "lib": ["DOM"]
     },
     "include": ["./src/**/*"]
