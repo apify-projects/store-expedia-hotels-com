@@ -10,9 +10,12 @@ Paste the URL of a property detail page, for example:
 https://www.expedia.com/Prague-Hotels-Hotel-Krystal.h10966026.Hotel-Information
 https://www.hotels.com/ho136900/hilton-prague-old-town-prague-czech-republic/
 https://www.expedia.it/en/Berchtesgaden-Hotels-Alpensport-Hotel-Seimler.h2692552.Hotel-Information
+https://www.vrbo.com/2506673
 ```
 
 Regional domains of the same brands work too, such as `expedia.it`, `expedia.com.tw`, `de.hotels.com` or `hoteis.com`. Extra query parameters are ignored, so you can paste a link straight from your browser.
+
+A URL copied straight out of a search result carries an `expediaPropertyId` parameter, and the Actor reads the property from there instead of loading the listing page - one request less per property, and no rate limiting to wait out on Vrbo.
 
 | Field                | Description                                                                                                    |
 | -------------------- | -------------------------------------------------------------------------------------------------------------- |

@@ -49,6 +49,27 @@ describe('findPropertyIdInUrl', () => {
         expect(findPropertyIdInUrl(url, HOTELS_HOST)).toBeUndefined();
     });
 
+    it('prefers the expediaPropertyId a search-result link carries', () => {
+        // Saves the listing-page fetch, which is the request Vrbo rate-limits hardest.
+        const vrbo = new URL('https://www.vrbo.com/2060810?selectedRoomType=57834301&expediaPropertyId=57834301');
+        expect(findPropertyIdInUrl(vrbo, VRBO_HOST)).toBe('57834301');
+
+        const hotels = new URL('https://www.hotels.com/ho140372/k-k-hotel-fenix/?expediaPropertyId=425227');
+        expect(findPropertyIdInUrl(hotels, HOTELS_HOST)).toBe('425227');
+    });
+
+    it('lets the query id win over a path id, since both name the same property', () => {
+        const url = new URL('https://www.expedia.com/x.h425227.Hotel-Information?expediaPropertyId=425227');
+
+        expect(findPropertyIdInUrl(url, EXPEDIA_HOST)).toBe('425227');
+    });
+
+    it('ignores a non-numeric expediaPropertyId', () => {
+        const url = new URL('https://www.hotels.com/ho140372/?expediaPropertyId=abc');
+
+        expect(findPropertyIdInUrl(url, HOTELS_HOST)).toBeUndefined();
+    });
+
     it('returns undefined for an Expedia URL with no property id in it', () => {
         expect(findPropertyIdInUrl(new URL('https://www.expedia.com/Hotel-Search'), EXPEDIA_HOST)).toBeUndefined();
     });

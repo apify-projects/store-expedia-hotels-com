@@ -33,7 +33,7 @@ const crawler = new CheerioCrawler({
     proxyConfiguration,
     httpClient: new ImpitHttpClient({ browser: Browser.Chrome }),
     maxConcurrency: 25,
-    maxRequestRetries: 15,
+    maxRequestRetries: 20,
     requestHandler: router,
     sessionPoolOptions: {
         sessionOptions: {

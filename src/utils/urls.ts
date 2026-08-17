@@ -13,6 +13,10 @@ export const resolveSiteHost = (hostname: string): SiteHost | undefined => {
 };
 
 export const findPropertyIdInUrl = (url: URL, site: SiteHost): string | undefined => {
+    // Links copied out of a search result carry the id, which saves fetching the listing page.
+    const fromQuery = url.searchParams.get('expediaPropertyId');
+    if (fromQuery && /^\d+$/.test(fromQuery)) return fromQuery;
+
     const { propertyIdPattern } = SITE_CONFIGS[site];
 
     return propertyIdPattern ? url.pathname.match(propertyIdPattern)?.[1] : undefined;

@@ -15,7 +15,7 @@ const sumReviewCounts = (counts: Record<string, number>): number =>
 
 export const reviewsRoute = async (context: CheerioCrawlingContext<ReviewsUserData, ResponseReviewsPage>) => {
     const { json, request, addRequests, crawler, log, useState } = context;
-    const { propertyId, startIndex, maxReviewsPerHotel, minDate } = request.userData;
+    const { site, propertyId, startIndex, maxReviewsPerHotel, minDate } = request.userData;
 
     const page = extractReviewsPage(json);
     if (!page) {
@@ -57,15 +57,16 @@ export const reviewsRoute = async (context: CheerioCrawlingContext<ReviewsUserDa
     const pageNumber = startIndex / PAGE_SIZE + 1;
 
     if (page.reviews.length === 0) {
-        log.info(`No reviews returned for property ${propertyId}`, { page: pageNumber });
+        log.info(`No reviews returned for property ${propertyId}`, { site, page: pageNumber });
     } else if (reviewsToPush.length === 0) {
         // Only the date cutoff can empty a non-empty page - the limits returned above.
-        log.info(`No reviews newer than ${minDate} for property ${propertyId}`, { page: pageNumber });
+        log.info(`No reviews newer than ${minDate} for property ${propertyId}`, { site, page: pageNumber });
     } else {
         await pushDataAndCharge(reviewsToPush, PPE_EVENTS.RESULT, crawler);
         state.reviewCounts[propertyId] = (state.reviewCounts[propertyId] ?? 0) + reviewsToPush.length;
 
         log.info(`Scraped ${reviewsToPush.length} reviews for property ${propertyId}`, {
+            site,
             page: pageNumber,
             reviewCount: page.totalCount,
         });
@@ -100,5 +101,5 @@ export const reviewsRoute = async (context: CheerioCrawlingContext<ReviewsUserDa
         startIndexes.map((nextStartIndex) => buildReviewsRequest({ ...request.userData, startIndex: nextStartIndex })),
     );
 
-    log.info(`Enqueued ${startIndexes.length} more review pages for property ${propertyId}`);
+    log.info(`Enqueued ${startIndexes.length} more review pages for property ${propertyId}`, { site });
 };

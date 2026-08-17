@@ -23,6 +23,12 @@ const MOBILE_HEADERS = {
         'ExpediaBookings/2026.25.0 Dalvik/2.1.0 (Linux; U; Android 12; sdk_gphone64_arm64 Build/S2B2.211203.006)',
 };
 
+// Vrbo answers a desktop user agent with 429 and a mobile one with 200.
+const LISTING_PAGE_HEADERS = {
+    'user-agent':
+        'Mozilla/5.0 (Linux; Android 12; sdk_gphone64_arm64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+};
+
 const buildReviewsPayload = ({ site, propertyId, startIndex, sortBy }: ReviewsUserData) => [
     {
         operationName: 'PropertyFilteredReviewsQuery',
@@ -103,6 +109,6 @@ export const buildStartRequests = (input: Input): RequestOptions<PropertyIdUserD
             return [buildReviewsRequest({ ...userData, propertyId, startIndex: 0 })];
         }
 
-        return [{ url: url.toString(), label: LABELS.PROPERTY_ID, userData }];
+        return [{ url: url.toString(), label: LABELS.PROPERTY_ID, headers: LISTING_PAGE_HEADERS, userData }];
     });
 };
