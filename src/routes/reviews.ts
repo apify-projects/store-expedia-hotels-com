@@ -10,6 +10,9 @@ import { getMaxPaidDatasetItems, pushDataAndCharge } from '../utils/charging.js'
 import { parseReviewDate } from '../utils/dates.js';
 import { buildRemainingStartIndexes } from '../utils/urls.js';
 
+const sumReviewCounts = (counts: Record<string, number>): number =>
+    Object.values(counts).reduce((total, count) => total + count, 0);
+
 export const reviewsRoute = async (context: CheerioCrawlingContext<ReviewsUserData, ResponseReviewsPage>) => {
     const { json, request, addRequests, crawler, log, useState } = context;
     const { propertyId, startIndex, maxReviewsPerHotel, minDate } = request.userData;
@@ -22,9 +25,9 @@ export const reviewsRoute = async (context: CheerioCrawlingContext<ReviewsUserDa
     const state = await useState<CrawlerState>();
     const maxPaidDatasetItems = getMaxPaidDatasetItems();
 
-    const scrapedCount = state.reviewCounts[propertyId] ?? 0;
-    const remainingForHotel = maxReviewsPerHotel ? maxReviewsPerHotel - scrapedCount : Infinity;
-    const remainingPaid = maxPaidDatasetItems - state.pushedCount;
+    // Counted from this page's own offset, so parallel pages truncate the same way whatever order they land in.
+    const remainingForHotel = maxReviewsPerHotel ? maxReviewsPerHotel - startIndex : Infinity;
+    const remainingPaid = maxPaidDatasetItems - sumReviewCounts(state.reviewCounts);
     const remaining = Math.min(remainingForHotel, remainingPaid);
 
     if (remaining <= 0) return;
@@ -60,8 +63,7 @@ export const reviewsRoute = async (context: CheerioCrawlingContext<ReviewsUserDa
         log.info(`No reviews newer than ${minDate} for property ${propertyId}`, { page: pageNumber });
     } else {
         await pushDataAndCharge(reviewsToPush, PPE_EVENTS.RESULT, crawler);
-        state.reviewCounts[propertyId] = scrapedCount + reviewsToPush.length;
-        state.pushedCount += reviewsToPush.length;
+        state.reviewCounts[propertyId] = (state.reviewCounts[propertyId] ?? 0) + reviewsToPush.length;
 
         log.info(`Scraped ${reviewsToPush.length} reviews for property ${propertyId}`, {
             page: pageNumber,
@@ -69,20 +71,21 @@ export const reviewsRoute = async (context: CheerioCrawlingContext<ReviewsUserDa
         });
     }
 
-    if (state.pushedCount >= maxPaidDatasetItems) {
+    if (sumReviewCounts(state.reviewCounts) >= maxPaidDatasetItems) {
         log.warningOnce('Reached the maximum number of paid results, stopping the actor.');
         await crawler.autoscaledPool?.abort();
         return;
     }
-
-    if (maxReviewsPerHotel && (state.reviewCounts[propertyId] ?? 0) >= maxReviewsPerHotel) return;
 
     // A cutoff only exists under Most recent sorting, which is strictly newest-first,
     // so once a page crosses it no later page can qualify.
     if (cutoff) {
         if (hasOlderThanMinDate || page.reviews.length < PAGE_SIZE) return;
 
-        await addRequests([buildReviewsRequest({ ...request.userData, startIndex: startIndex + PAGE_SIZE })]);
+        const nextStartIndex = startIndex + PAGE_SIZE;
+        if (maxReviewsPerHotel && nextStartIndex >= maxReviewsPerHotel) return;
+
+        await addRequests([buildReviewsRequest({ ...request.userData, startIndex: nextStartIndex })]);
         return;
     }
 

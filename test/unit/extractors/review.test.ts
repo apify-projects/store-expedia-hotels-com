@@ -1,15 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
 import { extractReview, extractReviewsPage } from '../../../src/extractors/review.js';
-import type { ResponseReviewsPage } from '../../../src/types/responses.js';
+import type { ResponseReview, ResponseReviewsPage } from '../../../src/types/responses.js';
 import { readJsonFixture } from '../../helpers.js';
 
-// Real responses, each trimmed to three reviews. Hotels.com carries management
-// responses and a region; Expedia carries themes, photos and translation info.
+// Real responses, each trimmed to three reviews. Hotels.com sends the author region and
+// management responses; Expedia sends themes, photos and helpful votes instead.
 const hotelsPage = () => readJsonFixture<ResponseReviewsPage>('reviews-page.json');
 const expediaPage = () => readJsonFixture<ResponseReviewsPage>('expedia-reviews-page.json');
 
 const context = { hotelId: '21856', reviewPosition: 1, customData: {} };
+const extractAll = (page: ResponseReviewsPage) =>
+    extractReviewsPage(page)!.reviews.map((review) => extractReview(review, context));
 
 describe('extractReviewsPage', () => {
     it('reads the reviews and the property total off a Hotels.com response', () => {
@@ -42,38 +44,85 @@ describe('extractReviewsPage', () => {
 });
 
 describe('extractReview', () => {
-    it('maps a Hotels.com review, flattening the management response header', () => {
-        const [raw] = extractReviewsPage(hotelsPage())!.reviews;
-        const review = extractReview(raw!, context);
+    it('turns the rating string into a number and keeps its wording', () => {
+        const [review] = extractAll(hotelsPage());
+
+        expect(review!.rating).toBe(10);
+        expect(review!.ratingText).toBe('Exceptional');
+    });
+
+    it('reads dates as ISO, not the API display format', () => {
+        for (const review of [...extractAll(hotelsPage()), ...extractAll(expediaPage())]) {
+            expect(review.publishedDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        }
+    });
+
+    it('resolves the author from whichever field the site populates', () => {
+        // Hotels.com leaves reviewAuthorAttribution null and only fills the footer.
+        expect(extractAll(hotelsPage()).every((review) => review.authorName)).toBe(true);
+        expect(extractAll(expediaPage()).every((review) => review.authorName)).toBe(true);
+    });
+
+    it('uppercases the author country when the site sends one', () => {
+        expect(extractAll(hotelsPage())[0]!.authorCountryCode).toBe('US');
+        expect(extractAll(expediaPage())[0]!.authorCountryCode).toBeNull();
+    });
+
+    it('pulls the nights stayed out of both stay-detail wordings', () => {
+        // Hotels.com writes "Christian, 5-night trip", Expedia "Stayed 3 nights in Oct 2024".
+        expect(extractAll(hotelsPage())[0]!.nightsStayed).toBe(5);
+        expect(extractAll(expediaPage()).some((review) => review.nightsStayed !== null)).toBe(true);
+    });
+
+    it('reads the stay month only from the wording that carries one', () => {
+        expect(extractAll(hotelsPage())[0]!.stayedMonth).toBeNull();
+        expect(extractAll(expediaPage())[0]!.stayedMonth).toMatch(/^\d{4}-\d{2}$/);
+    });
+
+    it('splits themes by sentiment and evens out their casing', () => {
+        const themed = extractAll(expediaPage()).find((review) => review.likedThemes.length > 0);
+
+        expect(themed!.likedThemes.length).toBeGreaterThan(1);
+        for (const theme of themed!.likedThemes) expect(theme[0]).toBe(theme[0]!.toUpperCase());
+    });
+
+    it('flattens management responses and parses the header', () => {
+        const [response] = extractAll(hotelsPage()).flatMap((review) => review.managementResponses);
+
+        expect(response!.authorName).toBeTruthy();
+        expect(response!.publishedDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        expect(response!.text).toBeTruthy();
+    });
+
+    it('reports helpful votes as a number, or null where the site omits them', () => {
+        expect(extractAll(expediaPage())[0]!.helpfulVoteCount).toEqual(expect.any(Number));
+        expect(extractAll(hotelsPage())[0]!.helpfulVoteCount).toBeNull();
+    });
+
+    it('nulls the empty strings the API uses for a missing title or text', () => {
+        const review = extractReview(
+            { ...extractReviewsPage(hotelsPage())!.reviews[0]!, title: '', text: '' },
+            context,
+        );
+
+        expect(review.title).toBeNull();
+        expect(review.text).toBeNull();
+    });
+
+    it('keeps collections as empty arrays rather than null', () => {
+        const raw = extractReviewsPage(hotelsPage())!.reviews[0]!;
+        const review = extractReview({ ...raw, themes: null, photos: [], managementResponses: [] }, context);
 
         expect(review).toMatchObject({
-            id: expect.any(String),
-            text: expect.any(String),
-            disclaimer: 'Verified review',
-            submissionTime: { longDateFormat: expect.any(String) },
-            reviewScoreWithDescription: { value: expect.stringMatching(/^\d+\/10/) },
-            hotelId: '21856',
-            reviewPosition: 1,
-        });
-        expect(review.managementResponses[0]).toMatchObject({
-            id: expect.any(String),
-            header: expect.stringContaining('Response from'),
-            response: expect.any(String),
+            likedThemes: [],
+            dislikedThemes: [],
+            photoUrls: [],
+            managementResponses: [],
         });
     });
 
-    it('maps Expedia themes and photos into flat shapes', () => {
-        const withThemes = extractReviewsPage(expediaPage())!.reviews.map((raw) => extractReview(raw, context));
-        const themed = withThemes.find((review) => review.themes.length > 0);
-        const pictured = withThemes.find((review) => review.photos.length > 0);
-
-        expect(themed?.themes[0]).toMatchObject({ sentimentId: expect.any(String), label: expect.any(String) });
-        expect(pictured?.photos[0]).toMatchObject({ url: expect.stringContaining('http') });
-    });
-
-    it('drops the analytics and tracking blobs the API sends alongside', () => {
-        const [raw] = extractReviewsPage(expediaPage())!.reviews;
-        const review = extractReview(raw!, context) as Record<string, unknown>;
+    it('drops the analytics and UI wrappers the API sends alongside', () => {
+        const review = extractAll(expediaPage())[0] as Record<string, unknown>;
 
         for (const key of [
             '__typename',
@@ -81,38 +130,29 @@ describe('extractReview', () => {
             'seeMoreAnalytics',
             'impressionAnalytics',
             'photoSection',
-            'contentDirectFeedbackPromptId',
+            'reviewFooter',
+            'reviewInteractionSections',
+            'reviewScoreWithDescription',
+            'submissionTime',
+            'superlative',
+            'disclaimer',
+            'brandType',
+            'travelers',
+            'highlightedText',
+            'propertyReviewSource',
         ]) {
             expect(review).not.toHaveProperty(key);
         }
     });
 
     it('passes the input userData straight through as customData', () => {
-        const [raw] = extractReviewsPage(hotelsPage())!.reviews;
+        const raw = extractReviewsPage(hotelsPage())!.reviews[0]! as ResponseReview;
         const customData = { hotel: 'Hilton Old Town', tags: ['a', 'b'], nested: { deep: 1 } };
 
-        const review = extractReview(raw!, { hotelId: '21856', reviewPosition: 4, customData });
+        const review = extractReview(raw, { hotelId: '21856', reviewPosition: 7, customData });
 
         expect(review.customData).toEqual(customData);
-        expect(review.reviewPosition).toBe(4);
-    });
-
-    it('turns a null themes list into an empty array', () => {
-        // themes and translationInfo are the fields the API really does send as null
-        // (measured on 300 live reviews); the rest are always present.
-        const [raw] = extractReviewsPage(hotelsPage())!.reviews;
-        const review = extractReview({ ...raw!, themes: null, translationInfo: null }, context);
-
-        expect(review.themes).toEqual([]);
-        expect(review.translationInfo).toBeNull();
-    });
-
-    it('keeps a null reviewRegion and reviewAuthorAttribution as null', () => {
-        // Expedia and Hotels.com each leave a different one of these unset.
-        const [raw] = extractReviewsPage(hotelsPage())!.reviews;
-        const review = extractReview({ ...raw!, reviewRegion: null, reviewAuthorAttribution: null }, context);
-
-        expect(review.reviewRegion).toBeNull();
-        expect(review.reviewAuthorAttribution).toBeNull();
+        expect(review.reviewPosition).toBe(7);
+        expect(review.hotelId).toBe('21856');
     });
 });

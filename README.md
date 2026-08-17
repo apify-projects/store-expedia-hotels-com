@@ -35,77 +35,62 @@ Open **Advanced** on a start URL and add any JSON under `userData`. It is copied
 
 ## Output
 
-Each review is one dataset item, keeping the field names Expedia's own API uses:
+Each review is one dataset item:
 
 ```json
 {
-    "id": "63f2848ddb4e6119d60c3d51",
-    "title": "",
-    "text": "Nice hotel near the airport with a great restaurant. The wifi, however, was non-existent.",
-    "superlative": "Good",
-    "locale": "fr_BE",
-    "disclaimer": "Verified review",
-    "highlightedText": null,
-    "brandType": null,
-    "propertyReviewSource": null,
-    "reviewScoreWithDescription": {
-        "label": "8 out of 10 Good",
-        "value": "8/10 Good"
-    },
-    "submissionTime": {
-        "longDateFormat": "Feb 19, 2023"
-    },
-    "reviewRegion": null,
-    "reviewAuthorAttribution": {
-        "text": "Diana"
-    },
-    "reviewFooter": {
-        "messages": [
-            {
-                "seoStructuredData": { "content": "Diana" },
-                "text": "Stayed 1 night in Feb 2023"
-            }
-        ]
-    },
-    "reviewInteractionSections": [
-        { "primaryDisplayString": "0", "reviewInteractionType": "HELPFUL_REVIEW" },
-        { "primaryDisplayString": null, "reviewInteractionType": "REVIEW_REPORT_FLAG" }
-    ],
-    "themes": [
-        {
-            "sentimentId": "sentiment_4",
-            "label": "Liked: Cleanliness, staff & service, amenities, property conditions & facilities"
-        }
-    ],
-    "photos": [],
-    "travelers": [],
-    "translationInfo": {
-        "targetLocale": null,
-        "translatedBy": "Translated by Google"
-    },
-    "managementResponses": [
-        {
-            "id": "91281c26-ee90-48f5-babf-386be3979a82",
-            "header": "Response from Helena on Mar 6, 2023",
-            "response": "Dear Diana, thank you for your feedback! Hotel Krystal"
-        }
-    ],
+    "reviewId": "63f2848ddb4e6119d60c3d51",
     "hotelId": "10966026",
     "reviewPosition": 26,
+    "publishedDate": "2023-02-19",
+    "rating": 8,
+    "ratingText": "Good",
+    "title": null,
+    "text": "Nice hotel near the airport with a great restaurant. The wifi, however, was non-existent.",
+    "locale": "fr_BE",
+    "isTranslated": true,
+    "authorName": "Diana",
+    "authorCountryCode": "BE",
+    "nightsStayed": 1,
+    "stayedMonth": "2023-02",
+    "helpfulVoteCount": 0,
+    "likedThemes": ["Cleanliness", "Staff & service"],
+    "dislikedThemes": ["Amenities"],
+    "photoUrls": [],
+    "managementResponses": [
+        {
+            "authorName": "Helena",
+            "publishedDate": "2023-03-06",
+            "text": "Dear Diana, thank you for your feedback! Hotel Krystal"
+        }
+    ],
     "customData": { "internalId": 4711, "city": "Prague" }
 }
 ```
 
-Fields worth pointing out:
+| Field                 | Notes                                                                                  |
+| --------------------- | -------------------------------------------------------------------------------------- |
+| `reviewId`            | Expedia's own review id.                                                               |
+| `hotelId`             | The property id the review belongs to, not the number in a Hotels.com URL.             |
+| `reviewPosition`      | Rank in the chosen sort order, counted across all pages from 1.                        |
+| `publishedDate`       | ISO date the review was submitted.                                                     |
+| `rating`              | Score out of 10, as a number. Both brands use a 10-point scale.                        |
+| `ratingText`          | Expedia's wording for that score, such as `Good` or `Exceptional`.                     |
+| `title`, `text`       | `null` when the guest left only a rating, which is common.                             |
+| `locale`              | Language the review was written in, such as `de_DE`.                                   |
+| `isTranslated`        | Whether Expedia is showing a machine translation.                                      |
+| `authorName`          | First name only; that is all Expedia publishes.                                        |
+| `authorCountryCode`   | Two-letter country code, uppercased. `null` on Expedia, which does not publish it.     |
+| `nightsStayed`        | Length of the stay.                                                                    |
+| `stayedMonth`         | Month of the stay as `YYYY-MM`. `null` on Hotels.com, which does not publish it.       |
+| `helpfulVoteCount`    | Guests who marked the review helpful. `null` on Hotels.com, which does not publish it. |
+| `likedThemes`         | What the guest praised, split out of Expedia's single label.                           |
+| `dislikedThemes`      | Same, for complaints.                                                                  |
+| `photoUrls`           | Guest photos, usually empty.                                                           |
+| `managementResponses` | The property's replies, with the author and date parsed out of the header.             |
+| `customData`          | Your `userData` for that property, passed through unchanged.                           |
 
-- `hotelId` - the property id the reviews belong to. Not the number in a Hotels.com URL, which is a separate listing id.
-- `reviewPosition` - the review's rank in the chosen sort order, counted across all pages from 1.
-- `customData` - your `userData` for that property, passed through unchanged.
-- `reviewScoreWithDescription.value` - the rating, as `"8/10 Good"`. Expedia and Hotels.com both use a 10-point scale.
-- `reviewInteractionSections` - the `HELPFUL_REVIEW` entry's `primaryDisplayString` holds the helpful-vote count.
-- `managementResponses` - the property owner's replies, empty when there are none.
-
-The API's analytics and tracking payloads (`reviewAnalytics`, `seeMoreAnalytics`, `impressionAnalytics`, `photoSection`, `feedbackAnalytics`, `accessibilityLabel`, `__typename`) are dropped, and four single-value wrappers are unpacked to the value they held: `themes[].icon.id` to `themes[].sentimentId`, `managementResponses[].header.text` to `.header`, `reviewFooter.messages[].text.text` to `.text`, and `translationInfo.translatedBy.description` to `.translatedBy`.
+Every review comes from a verified stay - Expedia only publishes reviews from confirmed bookings, so there is no unverified flag to filter on. The API's analytics and UI payloads are dropped, along with fields it never populates (`brandType`, `propertyReviewSource`, `highlightedText`, `travelers`).
 
 ## Notes
 

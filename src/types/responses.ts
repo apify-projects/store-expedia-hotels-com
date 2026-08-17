@@ -2,17 +2,14 @@
 // are ever actually missing a value.
 
 type ResponseTheme = {
-    icon: { id: string };
     label: string;
 };
 
 type ResponsePhoto = {
-    description: string;
     url: string;
 };
 
 type ResponseManagementResponse = {
-    id: string;
     header: { text: string };
     response: string;
 };
@@ -33,22 +30,17 @@ export type ResponseReview = {
     text: string;
     superlative: string;
     locale: string;
-    disclaimer: string;
-    reviewScoreWithDescription: { label: string; value: string };
+    reviewScoreWithDescription: { value: string };
     submissionTime: { longDateFormat: string };
     reviewFooter: { messages: ResponseFooterMessage[] };
     reviewInteractionSections: ResponseInteractionSection[];
     photos: ResponsePhoto[];
-    travelers: string[];
     managementResponses: ResponseManagementResponse[];
-    // Expedia and Hotels.com each leave a different half of these null.
-    reviewRegion: { id: string } | null;
+    // Expedia sends the author and themes, Hotels.com sends the region instead.
     reviewAuthorAttribution: { text: string } | null;
+    reviewRegion: { id: string } | null;
     themes: ResponseTheme[] | null;
-    translationInfo: { targetLocale: string | null; translatedBy: { description: string } } | null;
-    highlightedText: string | null;
-    brandType: string | null;
-    propertyReviewSource: string | null;
+    translationInfo: object | null;
 };
 
 /** The API answers a batched operation, hence the array. */

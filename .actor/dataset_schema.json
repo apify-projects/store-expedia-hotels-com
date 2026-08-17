@@ -9,29 +9,36 @@
                 "fields": [
                     "hotelId",
                     "reviewPosition",
+                    "publishedDate",
+                    "rating",
+                    "ratingText",
                     "title",
                     "text",
-                    "superlative",
-                    "locale",
-                    "submissionTime",
-                    "reviewScoreWithDescription",
-                    "reviewAuthorAttribution",
+                    "authorName",
+                    "authorCountryCode",
+                    "nightsStayed",
+                    "helpfulVoteCount",
+                    "likedThemes",
+                    "dislikedThemes",
                     "customData"
-                ],
-                "flatten": ["submissionTime", "reviewScoreWithDescription", "reviewAuthorAttribution"]
+                ]
             },
             "display": {
                 "component": "table",
                 "properties": {
                     "hotelId": { "label": "Hotel ID", "format": "text" },
                     "reviewPosition": { "label": "Position", "format": "number" },
+                    "publishedDate": { "label": "Published", "format": "date" },
+                    "rating": { "label": "Rating", "format": "number" },
+                    "ratingText": { "label": "Verdict", "format": "text" },
                     "title": { "label": "Title", "format": "text" },
                     "text": { "label": "Review", "format": "text" },
-                    "superlative": { "label": "Verdict", "format": "text" },
-                    "locale": { "label": "Locale", "format": "text" },
-                    "submissionTime.longDateFormat": { "label": "Submitted", "format": "text" },
-                    "reviewScoreWithDescription.value": { "label": "Score", "format": "text" },
-                    "reviewAuthorAttribution.text": { "label": "Author", "format": "text" },
+                    "authorName": { "label": "Author", "format": "text" },
+                    "authorCountryCode": { "label": "Country", "format": "text" },
+                    "nightsStayed": { "label": "Nights", "format": "number" },
+                    "helpfulVoteCount": { "label": "Helpful votes", "format": "number" },
+                    "likedThemes": { "label": "Liked", "format": "array" },
+                    "dislikedThemes": { "label": "Disliked", "format": "array" },
                     "customData": { "label": "Custom data", "format": "object" }
                 }
             }

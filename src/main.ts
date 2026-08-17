@@ -35,9 +35,14 @@ const crawler = new CheerioCrawler({
     maxConcurrency: 25,
     maxRequestRetries: 15,
     requestHandler: router,
+    sessionPoolOptions: {
+        sessionOptions: {
+            maxErrorScore: 1,
+        },
+    },
 });
 
-await crawler.useState<CrawlerState>({ reviewCounts: {}, pushedCount: 0 });
+await crawler.useState<CrawlerState>({ reviewCounts: {} });
 
 await crawler.run(startRequests);
 
