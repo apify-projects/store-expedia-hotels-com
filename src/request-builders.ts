@@ -77,32 +77,29 @@ export const buildReviewsRequest = (userData: ReviewsUserData): RequestOptions<R
 });
 
 export const buildStartRequests = (input: Input): RequestOptions<PropertyIdUserData | ReviewsUserData>[] => {
-    const settings = {
-        sortBy: input.sortBy,
-        maxReviewsPerHotel: input.maxReviewsPerHotel,
-        minDate: getMinDate(input.sortBy, input.minDate),
-    };
-
-    return (input.startUrls ?? []).flatMap((source): RequestOptions<PropertyIdUserData | ReviewsUserData>[] => {
-        const rawUrl = typeof source === 'string' ? source : source?.url;
-        if (!rawUrl) return [];
-
+    return input.startUrls.flatMap((source): RequestOptions<PropertyIdUserData | ReviewsUserData>[] => {
         let url: URL;
         try {
-            url = new URL(rawUrl.trim());
+            url = new URL(source.url.trim());
         } catch {
-            log.warning(`Skipping an invalid URL: ${rawUrl}`);
+            log.warning(`Skipping an invalid URL: ${source.url}`);
             return [];
         }
 
         const site = resolveSiteHost(url.hostname);
         if (!site) {
-            log.warning(`Skipping a URL that is not an Expedia, Hotels.com or Vrbo property: ${rawUrl}`);
+            log.warning(`Skipping a URL that is not an Expedia, Hotels.com or Vrbo property: ${source.url}`);
             return [];
         }
 
-        const customData = (typeof source === 'string' ? {} : source.userData) ?? {};
-        const userData: BaseUserData = { ...settings, site, customData };
+        const userData: BaseUserData = {
+            site,
+            propertyUrl: `${url.origin}${url.pathname}`,
+            customData: source.userData ?? {},
+            sortBy: input.sortBy,
+            maxReviewsPerHotel: input.maxReviewsPerHotel,
+            minDate: getMinDate(input.sortBy, input.minDate),
+        };
         const propertyId = findPropertyIdInUrl(url, site);
 
         if (propertyId) {

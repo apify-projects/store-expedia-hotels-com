@@ -84,6 +84,14 @@ describe('buildStartRequests', () => {
         expect(request?.userData?.site).toBe(HOTELS_HOST);
     });
 
+    it('carries the property URL without its tracking query string', () => {
+        const [request] = buildStartRequests(
+            input([{ url: 'https://www.vrbo.com/2060810?expediaPropertyId=57834301&sort=RECOMMENDED&top_cur=USD' }]),
+        );
+
+        expect(request?.userData?.propertyUrl).toBe('https://www.vrbo.com/2060810');
+    });
+
     it('carries userData through as customData', () => {
         const [request] = buildStartRequests(
             input([{ url: 'https://www.expedia.com/x.h1.Hotel-Information', userData: { hotel: 'Krystal' } }]),

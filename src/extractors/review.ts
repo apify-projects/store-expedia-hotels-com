@@ -49,6 +49,7 @@ const extractManagementResponses = (review: ResponseReview): ManagementResponse[
 
 type ReviewContext = {
     hotelId: string;
+    propertyUrl: string;
     reviewPosition: number;
     customData: Record<string, unknown>;
 };
@@ -65,6 +66,7 @@ export const extractReview = (review: ResponseReview, context: ReviewContext): R
     return {
         reviewId: review.id,
         hotelId: context.hotelId,
+        propertyUrl: context.propertyUrl,
         reviewPosition: context.reviewPosition,
         publishedDate: parseIsoDate(review.submissionTime.longDateFormat),
         rating: Number.isNaN(rating) ? null : rating,

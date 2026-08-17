@@ -8,6 +8,7 @@
             "transformation": {
                 "fields": [
                     "hotelId",
+                    "propertyUrl",
                     "reviewPosition",
                     "publishedDate",
                     "rating",
@@ -19,14 +20,14 @@
                     "nightsStayed",
                     "helpfulVoteCount",
                     "likedThemes",
-                    "dislikedThemes",
-                    "customData"
+                    "dislikedThemes"
                 ]
             },
             "display": {
                 "component": "table",
                 "properties": {
                     "hotelId": { "label": "Hotel ID", "format": "text" },
+                    "propertyUrl": { "label": "Property URL", "format": "link" },
                     "reviewPosition": { "label": "Position", "format": "number" },
                     "publishedDate": { "label": "Published", "format": "date" },
                     "rating": { "label": "Rating", "format": "number" },
@@ -38,8 +39,7 @@
                     "nightsStayed": { "label": "Nights", "format": "number" },
                     "helpfulVoteCount": { "label": "Helpful votes", "format": "number" },
                     "likedThemes": { "label": "Liked", "format": "array" },
-                    "dislikedThemes": { "label": "Disliked", "format": "array" },
-                    "customData": { "label": "Custom data", "format": "object" }
+                    "dislikedThemes": { "label": "Disliked", "format": "array" }
                 }
             }
         }

@@ -7,6 +7,7 @@ export type ManagementResponse = {
 export type Review = {
     reviewId: string;
     hotelId: string;
+    propertyUrl: string;
     reviewPosition: number;
     publishedDate: string | null;
     rating: number | null;

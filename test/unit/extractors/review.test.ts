@@ -9,7 +9,12 @@ import { readJsonFixture } from '../../helpers.js';
 const hotelsPage = () => readJsonFixture<ResponseReviewsPage>('reviews-page.json');
 const expediaPage = () => readJsonFixture<ResponseReviewsPage>('expedia-reviews-page.json');
 
-const context = { hotelId: '21856', reviewPosition: 1, customData: {} };
+const context = {
+    hotelId: '21856',
+    propertyUrl: 'https://www.hotels.com/ho136900/',
+    reviewPosition: 1,
+    customData: {},
+};
 const extractAll = (page: ResponseReviewsPage) =>
     extractReviewsPage(page)!.reviews.map((review) => extractReview(review, context));
 
@@ -149,10 +154,11 @@ describe('extractReview', () => {
         const raw = extractReviewsPage(hotelsPage())!.reviews[0]! as ResponseReview;
         const customData = { hotel: 'Hilton Old Town', tags: ['a', 'b'], nested: { deep: 1 } };
 
-        const review = extractReview(raw, { hotelId: '21856', reviewPosition: 7, customData });
+        const review = extractReview(raw, { ...context, reviewPosition: 7, customData });
 
         expect(review.customData).toEqual(customData);
         expect(review.reviewPosition).toBe(7);
         expect(review.hotelId).toBe('21856');
+        expect(review.propertyUrl).toBe('https://www.hotels.com/ho136900/');
     });
 });

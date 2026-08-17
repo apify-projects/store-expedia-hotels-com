@@ -6,13 +6,14 @@ import type { PropertyIdUserData } from '../types/user-data.js';
 
 export const propertyIdRoute = async (context: CheerioCrawlingContext<PropertyIdUserData>) => {
     const { $, request, addRequests, log } = context;
+    const { userData } = request;
 
     const propertyId = extractPropertyId($);
     if (!propertyId) {
-        throw new Error(`Could not find a property id on ${request.url}`);
+        throw new Error('Could not find a property id');
     }
 
-    log.info(`Resolved property ${propertyId} from ${request.url}`);
+    log.info(`Resolved property id: ${propertyId}`, { propertyUrl: userData.propertyUrl });
 
-    await addRequests([buildReviewsRequest({ ...request.userData, propertyId, startIndex: 0 })]);
+    await addRequests([buildReviewsRequest({ ...userData, propertyId, startIndex: 0 })]);
 };

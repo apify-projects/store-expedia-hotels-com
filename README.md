@@ -44,6 +44,7 @@ Each review is one dataset item:
 {
     "reviewId": "63f2848ddb4e6119d60c3d51",
     "hotelId": "10966026",
+    "propertyUrl": "https://www.expedia.com/Prague-Hotels-Hotel-Krystal.h10966026.Hotel-Information",
     "reviewPosition": 26,
     "publishedDate": "2023-02-19",
     "rating": 8,
@@ -75,6 +76,7 @@ Each review is one dataset item:
 | --------------------- | -------------------------------------------------------------------------------------- |
 | `reviewId`            | Expedia's own review id.                                                               |
 | `hotelId`             | The property id the review belongs to, not the number in a Hotels.com URL.             |
+| `propertyUrl`         | The property page the review came from, with any tracking parameters stripped.         |
 | `reviewPosition`      | Rank in the chosen sort order, counted across all pages from 1.                        |
 | `publishedDate`       | ISO date the review was submitted.                                                     |
 | `rating`              | Score out of 10, as a number. Both brands use a 10-point scale.                        |

@@ -2,6 +2,7 @@ import type { SiteHost, SortBy } from './common.js';
 
 export type BaseUserData = {
     site: SiteHost;
+    propertyUrl: string;
     customData: Record<string, unknown>;
     sortBy: SortBy;
     maxReviewsPerHotel?: number;
