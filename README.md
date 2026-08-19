@@ -1,105 +1,108 @@
-# Expedia / Hotels.com reviews scraper
+# Expedia / Hotels.com Reviews Scraper
 
-This is a simple scraper to get reviews from URLs hotels, apartments and other accommodations listed on Expedia.com and Hotels.com portals.
+Scrapes guest reviews from any hotel, apartment or other accommodation listed on Expedia, Hotels.com or Vrbo. Give it a property page URL and it returns every review on that property, not just the first page.
 
-For each hotel, input a link to the hotel detail page, which will look something like this:
+## Input
+
+Paste the URL of a property detail page, for example:
 
 ```raw
-https://www.expedia.com/Prague-Hotels-Pentahotel-Prague.h525006.Hotel-Information?chkin=2023-03-17&chkout=2023-03-18&x_pwa=1&rfrr=HSR&pwa_ts=1677850168323&sort=RECOMMENDED&top_dp=82&top_cur=USD&userIntent=
-https://www.hotels.com/ho136900/hilton-prague-old-town-prague-czech-republic/?pwaDialogNested=PropertyDetailsReviewsBreakdownDialog
+https://www.expedia.com/Prague-Hotels-Hotel-Krystal.h10966026.Hotel-Information
+https://www.hotels.com/ho136900/hilton-prague-old-town-prague-czech-republic/
 https://www.expedia.it/en/Berchtesgaden-Hotels-Alpensport-Hotel-Seimler.h2692552.Hotel-Information
+https://www.vrbo.com/2506673
 ```
 
-Additionally, you can click on the "Advanced" button in the URL input field and provide any `userData`. Everything provided here will be available on each review as `customData`, to allow later easy identification of which review belongs to which hotel.
+Regional domains of the same brands work too, such as `expedia.it`, `expedia.com.tw`, `de.hotels.com` or `hoteis.com`. Extra query parameters are ignored, so you can paste a link straight from your browser.
 
-You will get raw review data, so individual reviews will look something like this:
+A URL copied straight out of a search result carries an `expediaPropertyId` parameter, and the Actor reads the property from there instead of loading the listing page - one request less per property, and no rate limiting to wait out on Vrbo.
+
+| Field                | Description                                                                                                    |
+| -------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `startUrls`          | Property page URLs. Anything in a URL's `userData` comes back on each of its reviews as `customData`.          |
+| `maxReviewsPerHotel` | Cap on reviews per property. Leave empty to take all of them.                                                  |
+| `sortBy`             | Most relevant, Most recent, Highest guest rating, or Lowest guest rating.                                      |
+| `minDate`            | Skip reviews older than this date. Needs `sortBy` set to Most recent, since only that order runs newest-first. |
+| `debugLog`           | Verbose logging, for working out why a run behaved unexpectedly.                                               |
+
+### Tagging reviews with your own data
+
+Open **Advanced** on a start URL and add any JSON under `userData`. It is copied onto every review from that property as `customData`, which makes reviews easy to attribute when one run covers many properties:
 
 ```json
 {
-    "contentDirectFeedbackPromptId": null,
-    "id": "123456789abcdef",
-    "superlative": "Excellent",
-    "locale": "en_GB",
-    "title": "",
-    "brandType": "Expedia",
-    "reviewScoreWithDescription": {
-        "label": "10 out of 10 Excellent",
-        "value": "10/10 Excellent"
-    },
-    "text": "Excellent location and value for money. Great service. Clean. ",
-    "seeMoreAnalytics": {
-        "linkName": "See more reviews",
-        "referrerId": "HOT.HIS.See_more."
-    },
-    "submissionTime": {
-        "longDateFormat": "Apr 15, 2022"
-    },
-    "impressionAnalytics": null,
-    "themes": [
-        {
-            "icon": {
-                "id": "sentiment_4"
-            },
-            "label": "Liked: Cleanliness, staff & service, amenities, property conditions & facilities"
-        }
-    ],
-    "reviewFooter": {
-        "messages": [
-            {
-                "seoStructuredData": {
-                    "itemscope": true,
-                    "itemprop": "author",
-                    "itemtype": "https://schema.org/Person",
-                    "content": "John"
-                },
-                "text": {
-                    "text": "Stayed 1 night in Apr 2022"
-                }
-            }
-        ]
-    },
-    "reviewInteractionSections": [
-        {
-            "primaryDisplayString": "0",
-            "accessibilityLabel": "Mark review 3 as helpful. 0 other users found review 3 helpful.",
-            "reviewInteractionType": "HELPFUL_REVIEW",
-            "feedbackAnalytics": {
-                "linkName": "Helpful review",
-                "referrerId": "HOT.HIS.ReviewsOverlay.THUMB_UP.UPVOTE"
-            }
-        },
-        {
-            "primaryDisplayString": null,
-            "accessibilityLabel": null,
-            "reviewInteractionType": "REVIEW_REPORT_FLAG",
-            "feedbackAnalytics": null
-        }
-    ],
-
-    "reviewAuthorAttribution": {
-        "text": "John"
-    },
-    "photoSection": null,
-    "photos": [],
-    "travelers": ["Traveled with family"],
-    "translationInfo": null,
-    "propertyReviewSource": null,
-    "reviewRegion": null,
-    "managementResponses": [
-        {
-            "id": "3b23cd4c-ac5c-42a7-91f2-89b8d8dec7e2",
-            "header": {
-                "text": "Response from Jane on Apr 19, 2022"
-            },
-            "response": "Thank you so much, we appreciate it a lot!"
-        }
-    ],
-    "hotelId": "123456",
-    "customData": {
-        "userDataKey1": "your custom data here",
-        "userDataKey2": ["arbitrary JSON data can be here"]
-    }
+    "url": "https://www.expedia.com/Prague-Hotels-Hotel-Krystal.h10966026.Hotel-Information",
+    "userData": { "internalId": 4711, "city": "Prague" }
 }
 ```
+
+## Output
+
+Each review is one dataset item:
+
+```json
+{
+    "reviewId": "63f2848ddb4e6119d60c3d51",
+    "hotelId": "10966026",
+    "propertyUrl": "https://www.expedia.com/Prague-Hotels-Hotel-Krystal.h10966026.Hotel-Information",
+    "reviewPosition": 26,
+    "publishedDate": "2023-02-19",
+    "rating": 8,
+    "ratingText": "Good",
+    "title": null,
+    "text": "Nice hotel near the airport with a great restaurant. The wifi, however, was non-existent.",
+    "locale": "fr_BE",
+    "isTranslated": true,
+    "authorName": "Diana",
+    "authorCountryCode": "BE",
+    "nightsStayed": 1,
+    "stayedMonth": "2023-02",
+    "helpfulVoteCount": 0,
+    "likedThemes": ["Cleanliness", "Staff & service"],
+    "dislikedThemes": ["Amenities"],
+    "photoUrls": [],
+    "managementResponses": [
+        {
+            "authorName": "Helena",
+            "publishedDate": "2023-03-06",
+            "text": "Dear Diana, thank you for your feedback! Hotel Krystal"
+        }
+    ],
+    "customData": { "internalId": 4711, "city": "Prague" }
+}
+```
+
+| Field                 | Notes                                                                                  |
+| --------------------- | -------------------------------------------------------------------------------------- |
+| `reviewId`            | Expedia's own review id.                                                               |
+| `hotelId`             | The property id the review belongs to, not the number in a Hotels.com URL.             |
+| `propertyUrl`         | The property page the review came from, with any tracking parameters stripped.         |
+| `reviewPosition`      | Rank in the chosen sort order, counted across all pages from 1.                        |
+| `publishedDate`       | ISO date the review was submitted.                                                     |
+| `rating`              | Score out of 10, as a number. Both brands use a 10-point scale.                        |
+| `ratingText`          | Expedia's wording for that score, such as `Good` or `Exceptional`.                     |
+| `title`, `text`       | `null` when the guest left only a rating, which is common.                             |
+| `locale`              | Language the review was written in, such as `de_DE`.                                   |
+| `isTranslated`        | Whether Expedia is showing a machine translation.                                      |
+| `authorName`          | First name only; that is all Expedia publishes.                                        |
+| `authorCountryCode`   | Two-letter country code, uppercased. `null` on Expedia, which does not publish it.     |
+| `nightsStayed`        | Length of the stay.                                                                    |
+| `stayedMonth`         | Month of the stay as `YYYY-MM`. `null` on Hotels.com, which does not publish it.       |
+| `helpfulVoteCount`    | Guests who marked the review helpful. `null` on Hotels.com, which does not publish it. |
+| `likedThemes`         | What the guest praised, split out of Expedia's single label.                           |
+| `dislikedThemes`      | Same, for complaints.                                                                  |
+| `photoUrls`           | Guest photos, usually empty.                                                           |
+| `managementResponses` | The property's replies, with the author and date parsed out of the header.             |
+| `customData`          | Your `userData` for that property, passed through unchanged.                           |
+
+Every review comes from a verified stay - Expedia only publishes reviews from confirmed bookings, so there is no unverified flag to filter on. The API's analytics and UI payloads are dropped, along with fields it never populates (`brandType`, `propertyReviewSource`, `highlightedText`, `travelers`).
+
+## Notes
+
+**Review order.** Pages of a property are fetched in parallel, so items do not land in the dataset in sort order. Use `reviewPosition` to restore it. `sortBy` still decides which reviews you get when `maxReviewsPerHotel` is set.
+
+**Limits.** `maxReviewsPerHotel` applies per property, and a run-wide limit on results stops the whole run once reached.
+
+**Proxy.** The Actor uses Apify residential proxy. Expedia blocks datacenter IP ranges on the endpoint it reads, which costs whole pages of reviews rather than failing outright.
 
 Actor icon attribution: [Condominium icons created by Uniconlabs - Flaticon](https://www.flaticon.com/free-icons/condominium)

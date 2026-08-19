@@ -1,0 +1,47 @@
+{
+    "$schema": "https://apify.com/schemas/v1/dataset.ide.json",
+    "actorSpecification": 1,
+    "fields": {},
+    "views": {
+        "overview": {
+            "title": "Reviews",
+            "transformation": {
+                "fields": [
+                    "hotelId",
+                    "propertyUrl",
+                    "reviewPosition",
+                    "publishedDate",
+                    "rating",
+                    "ratingText",
+                    "title",
+                    "text",
+                    "authorName",
+                    "authorCountryCode",
+                    "nightsStayed",
+                    "helpfulVoteCount",
+                    "likedThemes",
+                    "dislikedThemes"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "hotelId": { "label": "Hotel ID", "format": "text" },
+                    "propertyUrl": { "label": "Property URL", "format": "link" },
+                    "reviewPosition": { "label": "Position", "format": "number" },
+                    "publishedDate": { "label": "Published", "format": "date" },
+                    "rating": { "label": "Rating", "format": "number" },
+                    "ratingText": { "label": "Verdict", "format": "text" },
+                    "title": { "label": "Title", "format": "text" },
+                    "text": { "label": "Review", "format": "text" },
+                    "authorName": { "label": "Author", "format": "text" },
+                    "authorCountryCode": { "label": "Country", "format": "text" },
+                    "nightsStayed": { "label": "Nights", "format": "number" },
+                    "helpfulVoteCount": { "label": "Helpful votes", "format": "number" },
+                    "likedThemes": { "label": "Liked", "format": "array" },
+                    "dislikedThemes": { "label": "Disliked", "format": "array" }
+                }
+            }
+        }
+    }
+}

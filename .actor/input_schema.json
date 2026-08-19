@@ -1,0 +1,58 @@
+{
+    "$schema": "https://apify.com/schemas/v1/input.ide.json",
+    "title": "Expedia / Hotels.com Reviews Scraper",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "startUrls": {
+            "title": "Property URLs",
+            "type": "array",
+            "description": "Expedia, Hotels.com or Vrbo property page URLs. Regional domains such as expedia.it or de.hotels.com work too, and extra query parameters are ignored. Open Advanced on a URL to attach any `userData` - it comes back on every review from that property as `customData`.",
+            "editor": "requestListSources",
+            "prefill": [
+                {
+                    "url": "https://www.expedia.com/Prague-Hotels-Hotel-Krystal.h10966026.Hotel-Information",
+                    "method": "GET",
+                    "userData": {
+                        "internalId": 4711,
+                        "city": "Prague"
+                    }
+                },
+                {
+                    "url": "https://www.hotels.com/ho136900/hilton-prague-old-town-prague-czech-republic/",
+                    "method": "GET"
+                }
+            ]
+        },
+        "maxReviewsPerHotel": {
+            "title": "Max reviews per property",
+            "type": "integer",
+            "minimum": 1,
+            "description": "Stop after this many reviews for each property. Leave empty to scrape all of them."
+        },
+        "sortBy": {
+            "title": "Sort reviews by",
+            "type": "string",
+            "description": "Which reviews come first, which decides what you get when you also set a maximum per property. Reviews are fetched in parallel, so the dataset is not ordered - use the `reviewPosition` field to restore the ranking.",
+            "editor": "select",
+            "default": "Most relevant",
+            "enum": ["Most relevant", "Most recent", "Highest guest rating", "Lowest guest rating"]
+        },
+        "minDate": {
+            "title": "Skip reviews older than",
+            "type": "string",
+            "description": "Only scrape reviews submitted on or after this date. Requires sorting by Most recent, because that is the only order that runs newest-first; it is ignored otherwise.",
+            "default": "1990-01-01",
+            "editor": "datepicker",
+            "dateType": "absolute"
+        },
+        "debugLog": {
+            "title": "Debug log",
+            "type": "boolean",
+            "description": "Log every request and page in detail, to troubleshoot an unexpected run.",
+            "default": false,
+            "editor": "hidden"
+        }
+    },
+    "required": ["startUrls"]
+}

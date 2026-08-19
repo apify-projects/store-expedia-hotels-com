@@ -2,9 +2,16 @@
 
 .DS_Store
 .idea
+.vscode
+.zed
 dist
 node_modules
 apify_storage
 storage
 
-storage
+# tsc build cache - if this is committed, the platform build skips emitting dist/
+# and the run fails with "Cannot find module dist/main.js".
+tsconfig.tsbuildinfo
+
+# Added by Apify CLI
+.venv

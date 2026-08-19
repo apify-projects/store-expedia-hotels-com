@@ -1,0 +1,12 @@
+.prettierignore
+dist
+package-lock.json
+
+# Payloads captured off the wire, kept byte-exact. Reformatting them rewrites the very
+# escaping the extractors match on, which silently breaks the tests.
+test/fixtures
+
+# Written by tooling, not by hand.
+.claude
+.mcp.json
+.proxy-mcp
